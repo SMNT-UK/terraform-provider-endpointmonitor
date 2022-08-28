@@ -148,7 +148,7 @@ func webJourneyCheck() *schema.Resource {
 							Optional:     true,
 							ValidateFunc: validatePositiveInt(),
 						},
-						"page_checks": {
+						"page_check": {
 							Type:        schema.TypeSet,
 							Description: "The set of checks to run against the currently loaded content.",
 							Optional:    true,
@@ -176,10 +176,9 @@ func webJourneyCheck() *schema.Resource {
 										ValidateFunc: validateWebJourneyPageCheckType(),
 									},
 									"check_for_text": {
-										Type:          schema.TypeSet,
-										Description:   "Check a specific stirng is present or absent on the current page.",
-										Optional:      true,
-										ConflictsWith: []string{".check_element_on_page"},
+										Type:        schema.TypeSet,
+										Description: "Check a specific stirng is present or absent on the current page.",
+										Optional:    true,
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"id": {
@@ -238,10 +237,9 @@ func webJourneyCheck() *schema.Resource {
 													Optional:    true,
 												},
 												"attribute_value": {
-													Type:         schema.TypeString,
-													Description:  "Further filter element matches out by having a given attribute value too.",
-													RequiredWith: []string{".attribute_name"},
-													Optional:     true,
+													Type:        schema.TypeString,
+													Description: "Further filter element matches out by having a given attribute value too.",
+													Optional:    true,
 												},
 												"element_content": {
 													Type:        schema.TypeString,
@@ -462,7 +460,7 @@ func webJourneyCheck() *schema.Resource {
 								},
 							},
 						},
-						"actions": {
+						"action": {
 							Type:        schema.TypeSet,
 							Description: "The set of actions to perform at the end of the step such as clicking on elements or enterting text.",
 							Optional:    true,
@@ -671,6 +669,13 @@ func webJourneyCheck() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validatePositiveInt(),
 			},
+			"proxy_host_id": {
+				Type:         schema.TypeInt,
+				Description:  "The id of the Proxy Host the check should use for a HTTP proxy if needed.",
+				Optional:     true,
+				Default:      nil,
+				ValidateFunc: validatePositiveInt(),
+			},
 		},
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -730,9 +735,9 @@ func resourceWebJourneyCheckUpdate(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	if d.HasChangesExcept() {
-		check := mapDNSCheck(d)
+		check := mapWebJourneyCheck(d)
 
-		_, err := c.UpdateDNSCheck(check)
+		_, err := c.UpdateWebJourneyCheck(check)
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -770,7 +775,7 @@ func mapWebJourneyCheck(d *schema.ResourceData) WebJourneyCheck {
 		checkId = 0
 	}
 
-	return WebJourneyCheck{
+	check := WebJourneyCheck{
 		Id:                  checkId,
 		Name:                d.Get("name").(string),
 		Description:         d.Get("description").(string),
@@ -791,6 +796,14 @@ func mapWebJourneyCheck(d *schema.ResourceData) WebJourneyCheck {
 			Id: d.Get("check_group_id").(int),
 		},
 	}
+
+	if d.Get("proxy_host_id").(int) != 0 {
+		check.ProxyHost = &ProxyHost{
+			Id: d.Get("proxy_host_id").(int),
+		}
+	}
+
+	return check
 }
 
 func mapMonitorDomains(d *schema.ResourceData) []MonitorDomain {
@@ -808,12 +821,13 @@ func mapMonitorDomains(d *schema.ResourceData) []MonitorDomain {
 func mapWebJourneySteps(d *schema.ResourceData) []WebJourneyStep {
 	steps := []WebJourneyStep{}
 	resourceSteps := d.Get("step").(*schema.Set).List()
+	stepId, _ := strconv.Atoi(d.Id())
 
 	for _, rawStep := range resourceSteps {
 		resourceStep := rawStep.(map[string]interface{})
 
 		step := WebJourneyStep{
-			Id:                  resourceStep["id"].(int),
+			Id:                  stepId,
 			Sequence:            resourceStep["sequence"].(int),
 			Type:                resourceStep["type"].(string),
 			Name:                resourceStep["name"].(string),
@@ -821,11 +835,11 @@ func mapWebJourneySteps(d *schema.ResourceData) []WebJourneyStep {
 			WaitTime:            resourceStep["wait_time"].(int),
 			WarningPageLoadTime: resourceStep["page_load_time_warning"].(int),
 			AlertPageLoadTime:   resourceStep["page_load_time_alert"].(int),
-			PageChecks:          mapWebJourneyPageChecks(resourceStep["page_checks"].(*schema.Set)),
+			PageChecks:          mapWebJourneyPageChecks(resourceStep["page_check"].(*schema.Set)),
 			AlertSuppressions: append(
 				mapWebJourneyNetworkSuppressions(resourceStep["network_suppression"].(*schema.Set)),
 				mapWebJourneyConsoleSuppressions(resourceStep["console_message_suppression"].(*schema.Set))...),
-			Actions: mapWebJourneyActions(resourceStep["actions"].(*schema.Set)),
+			Actions: mapWebJourneyActions(resourceStep["action"].(*schema.Set)),
 		}
 
 		steps = append(steps, step)
@@ -1053,6 +1067,10 @@ func mapWebJourneyScrollToElementAction(rawAction *schema.Set) *WebJourneyScroll
 }
 
 func mapWebJourneyCheckSchema(check WebJourneyCheck, d *schema.ResourceData) {
+	if check.ProxyHost != nil {
+		d.Set("proxy_host_id", check.ProxyHost.Id)
+	}
+
 	d.SetId(strconv.Itoa(check.Id))
 	d.Set("name", check.Name)
 	d.Set("description", check.Description)
@@ -1063,6 +1081,8 @@ func mapWebJourneyCheckSchema(check WebJourneyCheck, d *schema.ResourceData) {
 	d.Set("result_retention", check.ResultRetentionDays)
 	d.Set("window_height", check.WindowHeight)
 	d.Set("window_width", check.WindowWidth)
+	d.Set("check_host_id", check.CheckHost.Id)
+	d.Set("check_group_id", check.CheckGroup.Id)
 }
 
 func validateWebJourneyStepType() schema.SchemaValidateFunc {

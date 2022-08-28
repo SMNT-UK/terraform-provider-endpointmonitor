@@ -44,6 +44,7 @@ type URLCheck struct {
 	CheckStrings         []CheckString   `json:"checkStrings"`
 	CheckHost            CheckHost       `json:"checkHost"`
 	CheckGroup           CheckGroup      `json:"checkGroup"`
+	ProxyHost            *ProxyHost      `json:"proxyHost"`
 }
 
 type CheckString struct {
@@ -113,6 +114,7 @@ type WebJourneyCheck struct {
 	Steps               []WebJourneyStep `json:"steps"`
 	CheckHost           CheckHost        `json:"checkHost"`
 	CheckGroup          CheckGroup       `json:"checkGroup"`
+	ProxyHost           *ProxyHost       `json:"proxyHost"`
 }
 
 type MonitorDomain struct {
@@ -284,6 +286,31 @@ type WebJourneyScrollToElement struct {
 type RequestHeader struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
+}
+
+func (c *Client) SearchChecks(search string) (*[]Check, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/list?page=0&search=%s", c.HostURL, url.QueryEscape(search)), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	checks := []Check{}
+
+	if body != nil {
+		err = json.Unmarshal(body, &checks)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, nil
+	}
+
+	return &checks, nil
 }
 
 func (c *Client) SearchWebJourneyCommonSteps(search string) (*[]WebJourneyStep, error) {

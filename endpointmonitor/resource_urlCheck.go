@@ -104,9 +104,9 @@ func urlCheck() *schema.Resource {
 				Description: "The body to send as part of the check.",
 				Optional:    true,
 			},
-			"request_headers": {
+			"request_header": {
 				Type:        schema.TypeList,
-				Description: "Headers to send as part of the check.",
+				Description: "Header to send as part of the check.",
 				Optional:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -154,6 +154,12 @@ func urlCheck() *schema.Resource {
 				Type:         schema.TypeInt,
 				Description:  "The id of the Check Group the check belongs to. This also determines check frequency.",
 				Required:     true,
+				ValidateFunc: validatePositiveInt(),
+			},
+			"proxy_host_id": {
+				Type:         schema.TypeInt,
+				Description:  "The id of the Proxy Host the check should use for a HTTP proxy if needed.",
+				Optional:     true,
 				ValidateFunc: validatePositiveInt(),
 			},
 		},
@@ -255,7 +261,7 @@ func mapUrlCheck(d *schema.ResourceData) URLCheck {
 		checkId = 0
 	}
 
-	headers := d.Get("request_headers").([]interface{})
+	headers := d.Get("request_header").([]interface{})
 	requestHeaders := []RequestHeader{}
 
 	for _, header := range headers {
@@ -277,7 +283,7 @@ func mapUrlCheck(d *schema.ResourceData) URLCheck {
 		})
 	}
 
-	return URLCheck{
+	check := URLCheck{
 		Id:                   checkId,
 		Name:                 d.Get("name").(string),
 		Description:          d.Get("description").(string),
@@ -303,6 +309,14 @@ func mapUrlCheck(d *schema.ResourceData) URLCheck {
 			Id: d.Get("check_group_id").(int),
 		},
 	}
+
+	if d.Get("proxy_host_id").(int) != 0 {
+		check.ProxyHost = &ProxyHost{
+			Id: d.Get("proxy_host_id").(int),
+		}
+	}
+
+	return check
 }
 
 func mapUrlCheckSchema(check URLCheck, d *schema.ResourceData) {
@@ -324,7 +338,11 @@ func mapUrlCheckSchema(check URLCheck, d *schema.ResourceData) {
 	d.Set("request_body", check.RequestBody)
 	d.Set("check_host_id", check.CheckHost.Id)
 	d.Set("check_group_id", check.CheckGroup.Id)
-	d.Set("request_headers", check.RequestHeaders)
+	d.Set("request_header", check.RequestHeaders)
+
+	if check.ProxyHost != nil {
+		d.Set("proxy_host_id", check.ProxyHost.Id)
+	}
 }
 
 func validateUrl() schema.SchemaValidateFunc {

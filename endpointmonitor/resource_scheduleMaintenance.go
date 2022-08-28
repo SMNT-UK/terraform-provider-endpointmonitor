@@ -172,6 +172,27 @@ func mapMaintenancePeriod(d *schema.ResourceData) MaintenancePeriod {
 		id = 0
 	}
 
+	checks := d.Get("check_ids").([]interface{})
+	check_ids := make([]int, len(checks))
+
+	for index, check_id := range checks {
+		check_ids[index] = check_id.(int)
+	}
+
+	checkGroups := d.Get("check_group_ids").([]interface{})
+	check_group_ids := make([]int, len(checkGroups))
+
+	for index, check_group_id := range checkGroups {
+		check_group_ids[index] = check_group_id.(int)
+	}
+
+	appGroups := d.Get("app_group_ids").([]interface{})
+	app_group_ids := make([]int, len(appGroups))
+
+	for index, app_group_id := range appGroups {
+		app_group_ids[index] = app_group_id.(int)
+	}
+
 	return MaintenancePeriod{
 		Id:          id,
 		Description: d.Get("description").(string),
@@ -179,9 +200,9 @@ func mapMaintenancePeriod(d *schema.ResourceData) MaintenancePeriod {
 		DayOfWeek:   d.Get("day_of_week").(string),
 		StartTime:   d.Get("start_time").(string),
 		EndTime:     d.Get("end_time").(string),
-		Checks:      d.Get("check_ids").([]int),
-		CheckGroups: d.Get("check_group_ids").([]int),
-		AppGroups:   d.Get("app_group_ids").([]int),
+		Checks:      check_ids,
+		CheckGroups: check_group_ids,
+		AppGroups:   app_group_ids,
 	}
 }
 
