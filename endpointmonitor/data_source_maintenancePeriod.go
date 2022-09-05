@@ -61,10 +61,8 @@ func dataSourceMaintenancePeriodRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
-
 	for _, maintenancePeriod := range *maintenancePeriods {
-		d.Set("id", maintenancePeriod.Id)
+		d.SetId(strconv.Itoa(maintenancePeriod.Id))
 	}
 
 	return diags

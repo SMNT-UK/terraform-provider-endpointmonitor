@@ -62,10 +62,8 @@ func dataSourceCheckRead(ctx context.Context, d *schema.ResourceData, m interfac
 		return diag.FromErr(err)
 	}
 
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
-
 	for _, check := range *checks {
-		d.Set("id", check.Id)
+		d.SetId(strconv.Itoa(check.Id))
 	}
 
 	return diags

@@ -62,10 +62,8 @@ func dataSourceAppGroupRead(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
-
 	for _, appGroup := range *appGroups {
-		d.Set("id", appGroup.Id)
+		d.SetId(strconv.Itoa(appGroup.Id))
 	}
 
 	return diags

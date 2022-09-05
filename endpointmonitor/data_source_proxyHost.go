@@ -62,10 +62,8 @@ func dataSourceProxyHostRead(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
-
 	for _, proxyHost := range *proxyHosts {
-		d.Set("id", proxyHost.Id)
+		d.SetId(strconv.Itoa(proxyHost.Id))
 	}
 
 	return diags
