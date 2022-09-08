@@ -62,10 +62,8 @@ func dataSourceCheckHostRead(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 
-	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
-
 	for _, host := range *hosts {
-		d.Set("id", host.Id)
+		d.SetId(strconv.Itoa(host.Id))
 	}
 
 	return diags
