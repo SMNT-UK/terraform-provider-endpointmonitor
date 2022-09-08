@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    envirionment {
+    environment {
         EPM_API_KEY = credentials('terraform-epm-api-key')
         AWS_REGION="eu-central-1"
     }
