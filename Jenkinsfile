@@ -11,11 +11,12 @@ pipeline {
             agent {
                 docker {
                     image "golang:1.18-alpine"
+                    args "-u 0:0"
                 }
             }
 
             steps {
-                wsCleanup()
+                cleanWs()
 
                 sh "go mod tidy"
                 sh "go build -o terraform-provider-endpointmonitor"
@@ -28,7 +29,7 @@ pipeline {
             agent {
                 docker {
                     image "hashicorp/terraform"
-                    args "--entrypoint=''"
+                    args "-u 0:0 --entrypoint=''"
                 }
             }
 
@@ -45,8 +46,8 @@ pipeline {
                             credentialsId: 'aws-jenkins',
                             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                        sh "mkdir -p ~/.terraform.d/registry.terraform.io/smnt/endpointmonitor"
-                        sh "mv ./terraform-provider-endpointmonitor ~/.terraform.d/registry.terraform.io/smnt/endpointmonitor/"
+                        sh "mkdir -p ~/.terraform.d/plugins/registry.terraform.io/smnt/endpointmonitor/0.1/linux_amd64"
+                        sh "mv ./terraform-provider-endpointmonitor ~/.terraform.d/plugins/registry.terraform.io/smnt/endpointmonitor/0.1/linux_amd64/"
                         sh "terraform init"
                         sh "terraform plan -out terraform.plan"
                         sh "terraform apply terraform.plan"
