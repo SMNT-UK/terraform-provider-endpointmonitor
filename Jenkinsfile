@@ -40,6 +40,9 @@ pipeline {
                         sh "update-ca-certificates"
                     }
 
+                    sh "rm -rf .terraform"
+                    sh "rm -rf .terraform.d"
+
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                             credentialsId: 'aws-jenkins',
                             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
