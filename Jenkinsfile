@@ -16,8 +16,6 @@ pipeline {
             }
 
             steps {
-                cleanWs()
-
                 sh "go mod tidy"
                 sh "go build -o terraform-provider-endpointmonitor"
 

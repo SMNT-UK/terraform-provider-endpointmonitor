@@ -163,12 +163,14 @@ func mapCheckHost(d *schema.ResourceData) CheckHost {
 		checkId = 0
 	}
 
+	hostType := d.Get("type").(string)
+
 	return CheckHost{
 		Id:                  checkId,
 		Name:                d.Get("name").(string),
 		Description:         d.Get("description").(string),
 		Hostname:            d.Get("hostname").(string),
-		Type:                d.Get("type").(*string),
+		Type:                &hostType,
 		Enabled:             d.Get("enabled").(bool),
 		MaxWebJourneyChecks: d.Get("max_checks").(int),
 		SendCheckFiles:      d.Get("send_check_files").(bool),

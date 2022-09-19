@@ -407,7 +407,7 @@ func webJourneyCheck() *schema.Resource {
 									"response_code": {
 										Type:         schema.TypeInt,
 										Description:  "The response code for the given url that is to be suppressed for warnings or alerts.",
-										Required:     true,
+										Optional:     true,
 										ValidateFunc: validatePositiveInt(),
 									},
 									"any_client_error": {
@@ -806,6 +806,27 @@ func mapWebJourneyCheck(d *schema.ResourceData) WebJourneyCheck {
 	return check
 }
 
+func mapWebJourneyCommonStep(d *schema.ResourceData) WebJourneyCommonStep {
+	stepId, err := strconv.Atoi(d.Id())
+	if err != nil {
+		stepId = 0
+	}
+
+	return WebJourneyCommonStep{
+		Id:                  stepId,
+		Name:                d.Get("name").(string),
+		Description:         d.Get("description").(string),
+		WaitTime:            d.Get("wait_time").(int),
+		WarningPageLoadTime: d.Get("page_load_time_warning").(int),
+		AlertPageLoadTime:   d.Get("page_load_time_alert").(int),
+		PageChecks:          mapWebJourneyPageChecks(d.Get("page_check").(*schema.Set)),
+		AlertSuppressions: append(
+			mapWebJourneyNetworkSuppressions(d.Get("network_suppression").(*schema.Set)),
+			mapWebJourneyConsoleSuppressions(d.Get("console_message_suppression").(*schema.Set))...),
+		Actions: mapWebJourneyActions(d.Get("action").(*schema.Set)),
+	}
+}
+
 func mapMonitorDomains(d *schema.ResourceData) []MonitorDomain {
 	domains := []MonitorDomain{}
 	monitor_domains := d.Get("monitor_domain").([]interface{})
@@ -965,7 +986,7 @@ func mapWebJourneyNetworkSuppression(suppression map[string]interface{}) *WebJou
 	return &WebJourneyAlertSuppression{
 		Id:          suppression["id"].(int),
 		Description: suppression["description"].(string),
-		NetworkSuppression: NetworkSuppression{
+		NetworkSuppression: &NetworkSuppression{
 			Url:            suppression["url"].(string),
 			Comparison:     suppression["comparison"].(string),
 			ResponseCode:   suppression["response_code"].(int),
@@ -990,7 +1011,7 @@ func mapWebJourneyConsoleSuppression(suppression map[string]interface{}) *WebJou
 	return &WebJourneyAlertSuppression{
 		Id:          suppression["id"].(int),
 		Description: suppression["description"].(string),
-		ConsoleSuppression: ConsoleSuppression{
+		ConsoleSuppression: &ConsoleSuppression{
 			LogLevel:   suppression["log_level"].(string),
 			Message:    suppression["message"].(string),
 			Comparison: suppression["comparison"].(string),
@@ -1083,6 +1104,140 @@ func mapWebJourneyCheckSchema(check WebJourneyCheck, d *schema.ResourceData) {
 	d.Set("window_width", check.WindowWidth)
 	d.Set("check_host_id", check.CheckHost.Id)
 	d.Set("check_group_id", check.CheckGroup.Id)
+}
+
+func mapWebJourneyCommonStepSchema(step WebJourneyCommonStep, d *schema.ResourceData) {
+	d.SetId(strconv.Itoa(step.Id))
+	d.Set("name", step.Name)
+	d.Set("description", step.Description)
+	d.Set("wait_time", step.WaitTime)
+	d.Set("page_load_time_warning", step.WarningPageLoadTime)
+	d.Set("page_load_time_alert", step.AlertPageLoadTime)
+	d.Set("page_checks", mapWebJourneyPageChecksSchema(step.PageChecks))
+	d.Set("network_suppression", mapWebJourneyNetworkSuppressionsSchema(step.AlertSuppressions))
+	d.Set("console_message_suppression", mapWebJourneyConsoleSuppressionsSchema(step.AlertSuppressions))
+	d.Set("action", mapWebJourneyActionSchema(step.Actions))
+}
+
+func mapWebJourneyPageChecksSchema(pageChecks []*WebJourneyPageCheck) []map[string]interface{} {
+	var schema []map[string]interface{}
+
+	for _, pageCheck := range pageChecks {
+		pageCheckSchema := make(map[string]interface{})
+		pageCheckSchema["id"] = strconv.Itoa(pageCheck.Id)
+		pageCheckSchema["description"] = pageCheck.Description
+
+		schema = append(schema, pageCheckSchema)
+	}
+
+	return schema
+}
+
+func mapWebJourneyNetworkSuppressionsSchema(suppressions []*WebJourneyAlertSuppression) []map[string]interface{} {
+	var schema []map[string]interface{}
+
+	for _, suppression := range suppressions {
+		if suppression.NetworkSuppression != nil {
+			suppressionSchema := make(map[string]interface{})
+			suppressionSchema["id"] = strconv.Itoa(suppression.Id)
+			suppressionSchema["description"] = suppression.Description
+			suppressionSchema["comparison"] = suppression.NetworkSuppression.Comparison
+			suppressionSchema["response_code"] = suppression.NetworkSuppression.ResponseCode
+			suppressionSchema["url"] = suppression.NetworkSuppression.Url
+			suppressionSchema["any_client_error"] = suppression.NetworkSuppression.AnyClientError
+			suppressionSchema["any_server_error"] = suppression.NetworkSuppression.AnyServerError
+
+			schema = append(schema, suppressionSchema)
+		}
+	}
+
+	return schema
+}
+
+func mapWebJourneyConsoleSuppressionsSchema(suppressions []*WebJourneyAlertSuppression) []map[string]interface{} {
+	var schema []map[string]interface{}
+
+	for _, suppression := range suppressions {
+		if suppression.ConsoleSuppression != nil {
+			suppressionSchema := make(map[string]interface{})
+			suppressionSchema["id"] = strconv.Itoa(suppression.Id)
+			suppressionSchema["description"] = suppression.Description
+			suppressionSchema["comparison"] = suppression.ConsoleSuppression.Comparison
+			suppressionSchema["log_level"] = suppression.ConsoleSuppression.LogLevel
+			suppressionSchema["message"] = suppression.ConsoleSuppression.Message
+
+			schema = append(schema, suppressionSchema)
+		}
+	}
+
+	return schema
+}
+
+func mapWebJourneyActionSchema(actions []*WebJourneyAction) []map[string]interface{} {
+	var schema []map[string]interface{}
+
+	for _, action := range actions {
+		actionSchema := make(map[string]interface{})
+		actionSchema["sequence"] = action.Sequence
+		actionSchema["description"] = action.Description
+		actionSchema["type"] = action.Type
+		actionSchema["always_required"] = action.AlwaysRequired
+
+		switch action.Type {
+		case "CLICK":
+		case "DOUBLE_CLICK":
+		case "RIGHT_CLICK":
+			clickSchema := make(map[string]interface{})
+			clickSchema["element_type"] = action.WebJourneyClickAction.ElementType
+			clickSchema["search_text"] = action.WebJourneyClickAction.SearchText
+			clickSchema["xpath"] = action.WebJourneyClickAction.Xpath
+			actionSchema["click_action"] = clickSchema
+			break
+		case "TEXT_INPUT":
+			textInputSchema := make(map[string]interface{})
+			textInputSchema["input_text"] = action.WebJourneyTextInputAction.InputText
+			textInputSchema["element_id"] = action.WebJourneyTextInputAction.ElementId
+			textInputSchema["element_name"] = action.WebJourneyTextInputAction.ElementName
+			textInputSchema["xpath"] = action.WebJourneyTextInputAction.Xpath
+			actionSchema["text_input_action"] = textInputSchema
+			break
+		case "PASSWORD_INPUT":
+			passwordInputSchema := make(map[string]interface{})
+			passwordInputSchema["input_password"] = action.WebJourneyPasswordInputAction.Password
+			passwordInputSchema["element_id"] = action.WebJourneyPasswordInputAction.ElementId
+			passwordInputSchema["element_name"] = action.WebJourneyPasswordInputAction.ElementName
+			passwordInputSchema["xpath"] = action.WebJourneyPasswordInputAction.Xpath
+			actionSchema["password_input_action"] = passwordInputSchema
+			break
+		case "CHANGE_WINDOW_BY_ORDER":
+			actionSchema["window_id"] = action.WebJourneyChangeWindowByOrder.WindowId
+			break
+		case "CHANGE_WINDOW_BY_TITLE":
+			actionSchema["window_title"] = action.WebJourneyChangeWindowByTitle.Title
+			break
+		case "NAVIGATE_URL":
+			actionSchema["navigate_url"] = action.WebJourneyNavigateToUrl.Url
+			break
+		case "WAIT":
+			actionSchema["wait_time"] = action.WebJourneyWait.WaitTime
+			break
+		case "CHANGE_IFRAME_BY_ORDER":
+			actionSchema["iframe_id"] = action.WebJourneySelectIframeByOrder.IframeId
+			break
+		case "CHANGE_IFRAME_BY_XPATH":
+			actionSchema["iframe_xpath"] = action.WebJourneySelectIframeByXpath.Xpath
+			break
+		case "SCROLL_TO_ELEMENT":
+			elementScrollSchema := make(map[string]interface{})
+			elementScrollSchema["element_type"] = action.WebJourneyScrollToElement.ElementType
+			elementScrollSchema["search_text"] = action.WebJourneyScrollToElement.SearchText
+			elementScrollSchema["xpath"] = action.WebJourneyScrollToElement.Xpath
+			actionSchema["scroll_to_element"] = elementScrollSchema
+			break
+		}
+	}
+
+	return schema
 }
 
 func validateWebJourneyStepType() schema.SchemaValidateFunc {

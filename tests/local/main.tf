@@ -1,5 +1,6 @@
 terraform {
   backend "s3" {
+    region = "eu-central-1"
     bucket = "smnt-terraform-states"
     key    = "endpointmonitor/local/state.tfstate"
   }
@@ -12,7 +13,8 @@ terraform {
 }
 
 provider "endpointmonitor" {
-  url = "http://10.10.0.11:8080/api"
+  #url = "http://10.10.0.11:8080/api"
+  url = "http://192.168.44.99:8080/api"
   key = "7412f79a-70a4-450c-8c10-0b5e958a726d" # This is safe for leaving in, it's just a key on a local dev instance.
 }
 
@@ -60,7 +62,7 @@ resource "endpointmonitor_url_check" "test" {
     name  = "Agent"
     value = "EndPoint Monitor"
   }
-  check_host_id  = data.endpointmonitor_proxy_hosts.test.ids[1]
+  check_host_id  = data.endpointmonitor_check_host.test.id
   check_group_id = endpointmonitor_check_group.test.id
 }
 
@@ -70,14 +72,14 @@ resource "endpointmonitor_dns_check" "test" {
   hostname           = "smnt-read-sql01.net.smnt.co.uk"
   expected_addresses = ["10.20.0.31", "10.20.0.32"]
   trigger_count      = 5
-  check_host_id      = data.endpointmonitor_proxy_hosts.test.ids[1]
+  check_host_id      = endpointmonitor_check_host.test.id
   check_group_id     = endpointmonitor_check_group.test.id
 }
 
 resource "endpointmonitor_web_journey_check" "test" {
   name                 = "Terraform WebJourney Check"
   description          = "Terraform WebJourney check descrtiption"
-  enabled              = true
+  enabled              = false
   maintenance_override = true
   start_url            = "https://koolness.co.uk/test"
   trigger_count        = 2
@@ -117,9 +119,8 @@ resource "endpointmonitor_web_journey_check" "test" {
     }
   }
 
-  check_host_id  = data.endpointmonitor_proxy_hosts.test.ids[1]
+  check_host_id  = data.endpointmonitor_check_hosts.test.ids[0]
   check_group_id = endpointmonitor_check_group.test.id
-  #  proxy_host_id = endpointmonitor_proxy_host.test.id
 }
 
 resource "endpointmonitor_maintenance_period" "test" {
@@ -128,4 +129,22 @@ resource "endpointmonitor_maintenance_period" "test" {
   day_of_week = "ALL"
   start_time  = "01:00"
   end_time    = "03:00"
+}
+
+resource "endpointmonitor_web_journey_common_step" "test" {
+  name = "Teet"
+  description = "Test"
+  wait_time              = 10000
+  page_load_time_warning = 2000
+  page_load_time_alert   = 5000
+
+  page_check {
+    description = "Terraform Test Common Step Check 1"
+    type        = "CHECK_FOR_TEXT"
+
+    check_for_text {
+      text_to_find = "Testing Text to Find"
+      state        = "PRESENT"
+    }
+  } 
 }

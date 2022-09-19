@@ -43,3 +43,147 @@ resource "endpointmonitor_url_check" "integration_test" {
   warning_response_time  = 3000
   trigger_count          = 3
 }
+
+resource "endpointmonitor_dns_check" "integration_test" {
+  name               = "Integration DNS Test"
+  description        = "Integeration DNS Test. Managed by Terraform."
+  hostname           = "one.one.one.one"
+  expected_addresses = ["1.0.0.1", "1.1.1.1"]
+  trigger_count      = 2
+  check_host_id      = data.endpointmonitor_check_host.controller.id
+  check_group_id     = data.endpointmonitor_check_group.dns.id
+}
+
+resource "endpointmonitor_ping_check" "integration_test" {
+  name           = "Intgration Ping Test"
+  description    = "Integration Ping Test. Managed by Terraform."
+  hostname       = "bbc.co.uk"
+  trigger_count  = 3
+  check_host_id  = data.endpointmonitor_check_host.controller.id
+  check_group_id = data.endpointmonitor_check_group.network.id
+
+  warning_response_time = 2000
+  timeout_time          = 5000
+}
+
+resource "endpointmonitor_socket_check" "integration_test" {
+  name           = "Integration Socket Test"
+  description    = "Integration Socket Test. Managed by Terraform."
+  hostname       = "lttstore.co.uk"
+  port           = 443
+  trigger_count  = 2
+  check_host_id  = data.endpointmonitor_check_host.controller.id
+  check_group_id = data.endpointmonitor_check_group.database.id
+}
+
+resource "endpointmonitor_web_journey_check" "integration_test" {
+  name          = "Integration Web Journey Test"
+  description   = "Integration Web Journey Test. Managed by Terraform."
+  enabled       = true
+  start_url     = "https://koolness.co.uk/test/"
+  trigger_count = 3
+
+  monitor_domain {
+    domain              = "mycompany.com"
+    include_sub_domains = true
+  }
+
+  monitor_domain {
+    domain              = "auth0.com"
+    include_sub_domains = true
+  }
+
+  step {
+    sequence       = 0
+    name           = "Initial Page Load Checks"
+    type           = "COMMON"
+    common_step_id = data.endpointmonitor_web_journey_common_step.initial.id
+  }
+
+  step {
+    sequence               = 1
+    name                   = "Login"
+    type                   = "CUSTOM"
+    wait_time              = 5000
+    page_load_time_warning = 2000
+    page_load_time_alert   = 5000
+
+    page_check {
+      description = "Check not already logged in."
+      type        = "CHECK_FOR_TEXT"
+
+      check_for_text {
+        text_to_find = "Logout"
+        state        = "ABSENT"
+      }
+    }
+
+    action {
+      sequence        = 0
+      description     = "Enter username"
+      always_required = true
+      type            = "TEXT_INPUT"
+
+      text_input_action {
+        element_id = "login_username"
+        input_text = "my.user@mycompany.com"
+      }
+    }
+
+    action {
+      sequence        = 1
+      description     = "Enter password"
+      always_required = true
+      type            = "PASSWORD_INPUT"
+
+      password_input_action {
+        element_id = "login_password"
+        input_text = var.login_password
+      }
+    }
+
+    action {
+      sequence        = 2
+      description     = "Click Login"
+      always_required = true
+      type            = "PASSWORD_INPUT"
+
+      click_action {
+        search_text  = "Login"
+        element_type = "button"
+      }
+    }
+  }
+
+  step {
+    sequence = 2
+    name     = "Check Login Successful"
+    type     = "CUSTOM"
+
+    page_check {
+      description = "Check login response"
+      type        = "CHECK_URL_RESPONSE"
+
+      check_url_response {
+        url                   = "https://mywebsite.com/login"
+        comparison            = "STARTS_WITH"
+        warning_response_time = 1500
+        alert_response_time   = 3000
+        response_code         = 200
+      }
+    }
+
+    page_check {
+      description = "Check username is displayed"
+      type        = "CHECK_FOR_TEXT"
+
+      check_for_text {
+        text_to_find = "my.user@mycompany.com"
+        state        = "PRESENT"
+      }
+    }
+  }
+
+  check_host_id  = data.endpointmonitor_check_host.controller.id
+  check_group_id = endpointmonitor_check_group.websites.id
+}

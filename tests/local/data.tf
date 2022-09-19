@@ -3,7 +3,7 @@ data "endpointmonitor_proxy_hosts" "test" {
 }
 
 data "endpointmonitor_proxy_host" "test" {
-  search = "Terraform"
+  search = "VLAN10"
 }
 
 data "endpointmonitor_app_groups" "test" {

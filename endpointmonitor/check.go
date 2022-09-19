@@ -136,6 +136,18 @@ type WebJourneyStep struct {
 	Actions             []*WebJourneyAction           `json:"actions"`
 }
 
+type WebJourneyCommonStep struct {
+	Id                  int                           `json:"id"`
+	Name                string                        `json:"name"`
+	Description         string                        `json:"description"`
+	WaitTime            int                           `json:"waitTime"`
+	WarningPageLoadTime int                           `json:"warningPageLoadTime"`
+	AlertPageLoadTime   int                           `json:"alertPageLoadTime"`
+	PageChecks          []*WebJourneyPageCheck        `json:"pageChecks"`
+	AlertSuppressions   []*WebJourneyAlertSuppression `json:"alertSuppressions"`
+	Actions             []*WebJourneyAction           `json:"actions"`
+}
+
 type WebJourneyPageCheck struct {
 	Id                   int                   `json:"id"`
 	Description          string                `json:"description"`
@@ -192,10 +204,10 @@ type PageCheckConsoleLog struct {
 }
 
 type WebJourneyAlertSuppression struct {
-	Id                 int                `json:"id"`
-	Description        string             `json:"description"`
-	NetworkSuppression NetworkSuppression `json:"networkSuppression"`
-	ConsoleSuppression ConsoleSuppression `json:"consoleSuppression"`
+	Id                 int                 `json:"id"`
+	Description        string              `json:"description"`
+	NetworkSuppression *NetworkSuppression `json:"networkSuppression"`
+	ConsoleSuppression *ConsoleSuppression `json:"consoleSuppression"`
 }
 
 type NetworkSuppression struct {
@@ -519,6 +531,31 @@ func (c *Client) GetWebJourneyCheck(id string) (*WebJourneyCheck, error) {
 	return &pingCheck, nil
 }
 
+func (c *Client) GetWebJourneyCommonStep(id string) (*WebJourneyCommonStep, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/commonWebJourneySteps/%s", c.HostURL, id), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	step := WebJourneyCommonStep{}
+
+	if body != nil {
+		err = json.Unmarshal(body, &step)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, nil
+	}
+
+	return &step, nil
+}
+
 func (c *Client) CreateUrlCheck(check URLCheck) (*URLCheck, error) {
 	rb, err := json.Marshal(check)
 	if err != nil {
@@ -651,6 +688,34 @@ func (c *Client) CreateWebJourneyCheck(check WebJourneyCheck, ctx context.Contex
 	return &newCheck, nil
 }
 
+func (c *Client) CreateWebJourneyCommonStep(step WebJourneyCommonStep, ctx context.Context) (*WebJourneyStep, error) {
+	rb, err := json.Marshal(step)
+	if err != nil {
+		return nil, err
+	}
+
+	tflog.Error(ctx, string(rb))
+
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/checks/commonWebJourneySteps/add", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	newStep := WebJourneyStep{}
+
+	err = json.Unmarshal(body, &newStep)
+	if err != nil {
+		return nil, err
+	}
+
+	return &newStep, nil
+}
+
 func (c *Client) UpdateUrlCheck(check URLCheck) (*URLCheck, error) {
 	rb, err := json.Marshal(check)
 	if err != nil {
@@ -776,8 +841,52 @@ func (c *Client) UpdateWebJourneyCheck(check WebJourneyCheck) (*WebJourneyCheck,
 	return &updatedCheck, nil
 }
 
+func (c *Client) UpdateWebJourneyCommonStep(step WebJourneyCommonStep) (*WebJourneyStep, error) {
+	rb, err := json.Marshal(step)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/checks/commonWebJourneySteps/update", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedStep := WebJourneyStep{}
+	err = json.Unmarshal(body, &updatedStep)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedStep, nil
+}
+
 func (c *Client) DeleteCheck(checkId int) error {
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/checks/remove/%d", c.HostURL, checkId), nil)
+	if err != nil {
+		return err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return err
+	}
+
+	if string(body) != "{\"success\":true}" {
+		return errors.New(string(body))
+	}
+
+	return nil
+}
+
+func (c *Client) DeleteCommonStep(stepId int) error {
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/checks/commonWebJourneySteps/remove/%d", c.HostURL, stepId), nil)
 	if err != nil {
 		return err
 	}
