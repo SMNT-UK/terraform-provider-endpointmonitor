@@ -50,8 +50,8 @@ resource "endpointmonitor_dns_check" "integration_test" {
   hostname           = "one.one.one.one"
   expected_addresses = ["1.0.0.1", "1.1.1.1"]
   trigger_count      = 2
-  check_host_id      = data.endpointmonitor_check_host.controller.id
-  check_group_id     = data.endpointmonitor_check_group.dns.id
+  check_host_id      = data.endpointmonitor_check_host.epm_01.id
+  check_group_id     = data.endpointmonitor_check_group.integration_tests.id
 }
 
 resource "endpointmonitor_ping_check" "integration_test" {
@@ -59,8 +59,8 @@ resource "endpointmonitor_ping_check" "integration_test" {
   description    = "Integration Ping Test. Managed by Terraform."
   hostname       = "bbc.co.uk"
   trigger_count  = 3
-  check_host_id  = data.endpointmonitor_check_host.controller.id
-  check_group_id = data.endpointmonitor_check_group.network.id
+  check_host_id  = data.endpointmonitor_check_host.epm_01.id
+  check_group_id = data.endpointmonitor_check_group.endpointmonitor_check_group.id
 
   warning_response_time = 2000
   timeout_time          = 5000
@@ -72,8 +72,8 @@ resource "endpointmonitor_socket_check" "integration_test" {
   hostname       = "lttstore.co.uk"
   port           = 443
   trigger_count  = 2
-  check_host_id  = data.endpointmonitor_check_host.controller.id
-  check_group_id = data.endpointmonitor_check_group.database.id
+  check_host_id  = data.endpointmonitor_check_host.epm_01.id
+  check_group_id = data.endpointmonitor_check_group.endpointmonitor_check_group.id
 }
 
 resource "endpointmonitor_web_journey_check" "integration_test" {
@@ -184,6 +184,6 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
     }
   }
 
-  check_host_id  = data.endpointmonitor_check_host.controller.id
-  check_group_id = endpointmonitor_check_group.websites.id
+  check_host_id  = data.endpointmonitor_check_host.epm_01.id
+  check_group_id = endpointmonitor_check_group.endpointmonitor_check_group.id
 }
