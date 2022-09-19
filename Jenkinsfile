@@ -42,6 +42,7 @@ pipeline {
 
                     sh "rm -rf .terraform"
                     sh "rm -rf .terraform.d"
+                    sh "rm -f .terraform.lock.hcl"
 
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                             credentialsId: 'aws-jenkins',
