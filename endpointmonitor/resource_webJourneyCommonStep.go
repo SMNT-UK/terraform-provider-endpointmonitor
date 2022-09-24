@@ -79,7 +79,7 @@ func webJourneyCommonStep() *schema.Resource {
 						},
 						"check_for_text": {
 							Type:        schema.TypeSet,
-							Description: "Check a specific stirng is present or absent on the current page.",
+							Description: "Check a specific string is present or absent on the current page.",
 							Optional:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -89,7 +89,7 @@ func webJourneyCommonStep() *schema.Resource {
 									},
 									"text_to_find": {
 										Type:         schema.TypeString,
-										Description:  "The string to search for for on the page.",
+										Description:  "The string to search for on the page.",
 										Required:     true,
 										ValidateFunc: validation.StringIsNotEmpty,
 									},
@@ -100,7 +100,7 @@ func webJourneyCommonStep() *schema.Resource {
 									},
 									"state": {
 										Type:         schema.TypeString,
-										Description:  "Must be either PRESENT or ABSENT. PRESENT means the text_to_find must be found on the page for the check to succeed. ABSENT mesns the text_to_find must not be on the page for the check to succeed.",
+										Description:  "Must be either PRESENT or ABSENT. PRESENT means the text_to_find must be found on the page for the check to succeed. ABSENT means the text_to_find must not be on the page for the check to succeed.",
 										Required:     true,
 										ValidateFunc: validateWebJourneyState(),
 									},
@@ -109,7 +109,7 @@ func webJourneyCommonStep() *schema.Resource {
 						},
 						"check_element_on_page": {
 							Type:        schema.TypeSet,
-							Description: "Check for a specific element and it's attributes on the current page.",
+							Description: "Check for a specific element and its attributes on the current page.",
 							Optional:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -129,7 +129,7 @@ func webJourneyCommonStep() *schema.Resource {
 									},
 									"state": {
 										Type:         schema.TypeString,
-										Description:  "Must be either PRESENT or ABSENT. PRESENT means the element must be found oth epage for the check to succeed. ABSNET means the element must not be on the page for the check to succeed.",
+										Description:  "Must be either PRESENT or ABSENT. PRESENT means the element must be found on the page for the check to succeed. ABSENT means the element must not be on the page for the check to succeed.",
 										Required:     true,
 										ValidateFunc: validateWebJourneyState(),
 									},
@@ -194,7 +194,7 @@ func webJourneyCommonStep() *schema.Resource {
 									},
 									"comparison": {
 										Type:         schema.TypeString,
-										Description:  "Must be one of EQUALS, DOES_NOT_EQUAL, STARTS_WITH, ENDS_WITH, CONTAINS or DOES_NOT_CONTAIN. The way to compare the given url against the network requets made.",
+										Description:  "Must be one of EQUALS, DOES_NOT_EQUAL, STARTS_WITH, ENDS_WITH, CONTAINS or DOES_NOT_CONTAIN. The way to compare the given url against the network requests made.",
 										Required:     true,
 										ValidateFunc: validateWebJourneyCommonComparitor(),
 									},
@@ -290,7 +290,7 @@ func webJourneyCommonStep() *schema.Resource {
 						},
 						"description": {
 							Type:         schema.TypeString,
-							Description:  "Space for a description of what this is supressing.",
+							Description:  "Space for a description of what this is suppressing.",
 							Required:     true,
 							ValidateFunc: validation.StringIsNotEmpty,
 						},
@@ -337,7 +337,7 @@ func webJourneyCommonStep() *schema.Resource {
 						},
 						"description": {
 							Type:         schema.TypeString,
-							Description:  "Space for a description of what this is supressing.",
+							Description:  "Space for a description of what this is suppressing.",
 							Required:     true,
 							ValidateFunc: validation.StringIsNotEmpty,
 						},
@@ -364,7 +364,7 @@ func webJourneyCommonStep() *schema.Resource {
 			},
 			"action": {
 				Type:        schema.TypeSet,
-				Description: "The set of actions to perform at the end of the step such as clicking on elements or enterting text.",
+				Description: "The set of actions to perform at the end of the step such as clicking on elements or entering text.",
 				Optional:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -382,7 +382,7 @@ func webJourneyCommonStep() *schema.Resource {
 						},
 						"always_required": {
 							Type:        schema.TypeBool,
-							Description: "If true the the action given must be able to be completed against the current page, and if it can't the check will be marked as failed. If false, and the action can't complete, for example because the element is missing, the step will continue onto the next action regardless.",
+							Description: "If true the action given must be able to be completed against the current page, and if it can't the check will be marked as failed. If false, and the action can't complete, for example because the element is missing, the step will continue onto the next action regardless.",
 							Optional:    true,
 							Default:     false,
 						},
@@ -435,13 +435,13 @@ func webJourneyCommonStep() *schema.Resource {
 									},
 									"element_id": {
 										Type:         schema.TypeString,
-										Description:  "The id of the element to input text into. Not to be used with xapth or element_name.",
+										Description:  "The id of the element to input text into. Not to be used with xpath or element_name.",
 										Optional:     true,
 										ValidateFunc: validation.StringIsNotEmpty,
 									},
 									"element_name": {
 										Type:         schema.TypeString,
-										Description:  "The name of the element to input text into. Not to be used with xapth or element_id.",
+										Description:  "The name of the element to input text into. Not to be used with xpath or element_id.",
 										Optional:     true,
 										ValidateFunc: validation.StringIsNotEmpty,
 									},
@@ -469,13 +469,13 @@ func webJourneyCommonStep() *schema.Resource {
 									},
 									"element_id": {
 										Type:         schema.TypeString,
-										Description:  "The id of the element to input the password into. Not to be used with xapth or element_name.",
+										Description:  "The id of the element to input the password into. Not to be used with xpath or element_name.",
 										Optional:     true,
 										ValidateFunc: validation.StringIsNotEmpty,
 									},
 									"element_name": {
 										Type:         schema.TypeString,
-										Description:  "The name of the element to input the password into. Not to be used with xapth or element_id.",
+										Description:  "The name of the element to input the password into. Not to be used with xpath or element_id.",
 										Optional:     true,
 										ValidateFunc: validation.StringIsNotEmpty,
 									},

@@ -62,7 +62,7 @@ resource "endpointmonitor_url_check" "example" {
 - `timeout` (Number) The number of milliseconds to wait for a response before giving up.
 - `trigger_count` (Number) The sequential number of failures that need to occur for a check to trigger an alert or notification.
 - `url` (String) The URL to check
-- `warning_response_time` (Number) The warning response time threshold in millisonds.
+- `warning_response_time` (Number) The warning response time threshold in milliseconds.
 
 ### Optional
 

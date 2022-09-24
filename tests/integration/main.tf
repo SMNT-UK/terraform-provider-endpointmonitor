@@ -60,7 +60,7 @@ resource "endpointmonitor_ping_check" "integration_test" {
   hostname       = "bbc.co.uk"
   trigger_count  = 3
   check_host_id  = data.endpointmonitor_check_host.epm_01.id
-  check_group_id = data.endpointmonitor_check_group.endpointmonitor_check_group.id
+  check_group_id = data.endpointmonitor_check_group.integration_tests.id
 
   warning_response_time = 2000
   timeout_time          = 5000
@@ -73,7 +73,7 @@ resource "endpointmonitor_socket_check" "integration_test" {
   port           = 443
   trigger_count  = 2
   check_host_id  = data.endpointmonitor_check_host.epm_01.id
-  check_group_id = data.endpointmonitor_check_group.endpointmonitor_check_group.id
+  check_group_id = data.endpointmonitor_check_group.integration_tests.id
 }
 
 resource "endpointmonitor_web_journey_check" "integration_test" {
@@ -185,5 +185,55 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
   }
 
   check_host_id  = data.endpointmonitor_check_host.epm_01.id
-  check_group_id = endpointmonitor_check_group.endpointmonitor_check_group.id
+  check_group_id = endpointmonitor_check_group.integration_tests.id
+}
+
+resource "endpointmonitor_web_journey_common_step" "initial" {
+  name                   = "Initial Page Load Suppressions"
+  description            = "Suppresses known errors for initial page load"
+  wait_time              = 5000
+  page_load_time_warning = 2500
+  page_load_time_alert   = 5000
+
+  console_message_suppression {
+    description = "Suppress Toastie202 not resolved error"
+    log_level   = "ERROR"
+    message     = "https://toastie202.co.uk/something.jpg - Failed to load resource: net::ERR_NAME_NOT_RESOLVED"
+    comparison  = "EQUALS"
+  }
+
+  console_message_suppression {
+    description = "Suppress Test Error"
+    log_level   = "ERROR"
+    message     = "This is a test error, but"
+    comparison  = "CONTAINS"
+  }
+
+  console_message_suppression {
+    description = "Supress CSP Error"
+    log_level   = "ERROR"
+    message     = "Content Security Policy directive: \"frame-ancestors 'self'\"."
+    comparison  = "ENDS_WITH"
+  }
+
+  network_suppression {
+    description   = "Suppress test/nonexistent.js"
+    url           = "https://koolness.co.uk/test/nonexistent.js"
+    response_code = 404
+    comparison    = "EQUALS"
+  }
+
+  network_suppression {
+    description   = "Suppress test/thisisnsright.png"
+    url           = "test/thisisnsright.png"
+    response_code = 404
+    comparison    = "ENDS_WITH"
+  }
+
+  network_suppression {
+    description   = "Suppress smnt.co.uk/someUnknownImage.png"
+    url           = "https://smnt.co.uk/someUnknownImage.png"
+    response_code = 404
+    comparison    = "EQUALS"
+  }
 }

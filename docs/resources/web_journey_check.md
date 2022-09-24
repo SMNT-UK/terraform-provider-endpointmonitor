@@ -289,13 +289,13 @@ Required:
 
 - `comparison` (String) Must be EQUALS, STARTS_WITH, ENDS_WITH or CONTAINS. The way to compare the given url to the network calls made after the last step.
 - `description` (String) Space for a description of what this is supressing.
-- `response_code` (Number) The response code for the given url that is to be suppressed for warnings or alerts.
 - `url` (String) The full or part URL to suppress.
 
 Optional:
 
 - `any_client_error` (Boolean) Suppress any 400-499 response code for the given url.
 - `any_server_error` (Boolean) Suppress any 500-599 response code for the given url.
+- `response_code` (Number) The response code for the given url that is to be suppressed for warnings or alerts.
 
 Read-Only:
 

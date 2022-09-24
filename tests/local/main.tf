@@ -132,8 +132,8 @@ resource "endpointmonitor_maintenance_period" "test" {
 }
 
 resource "endpointmonitor_web_journey_common_step" "test" {
-  name = "Teet"
-  description = "Test"
+  name                   = "Test Common Step"
+  description            = "Generic Test Common Step"
   wait_time              = 10000
   page_load_time_warning = 2000
   page_load_time_alert   = 5000
@@ -146,5 +146,5 @@ resource "endpointmonitor_web_journey_common_step" "test" {
       text_to_find = "Testing Text to Find"
       state        = "PRESENT"
     }
-  } 
+  }
 }

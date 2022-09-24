@@ -24,7 +24,7 @@ func checkHost() *schema.Resource {
 			},
 			"name": {
 				Type:        schema.TypeString,
-				Description: "A friendly name to describe the host. This is what the host will be refered to as on all screens and alerts.",
+				Description: "A friendly name to describe the host. This is what the host will be referred to as on all screens and alerts.",
 				Required:    true,
 			},
 			"description": {
@@ -34,7 +34,7 @@ func checkHost() *schema.Resource {
 			},
 			"hostname": {
 				Type:        schema.TypeString,
-				Description: "The hostname of the host. Must match what the host believes it's own hostname is.",
+				Description: "The hostname of the host. Must match what the host believes its own hostname is.",
 				Required:    true,
 			},
 			"enabled": {

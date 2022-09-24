@@ -48,7 +48,7 @@ resource "endpointmonitor_ping_check" "example" {
 - `name` (String) A name to describe in the check, used throughout EndPoint Monitor to describe this check, including in notifications.
 - `timeout_time` (Number) The number of milliseconds to wait for a response before giving up.
 - `trigger_count` (Number) The sequential number of failures that need to occur for a check to trigger an alert or notification.
-- `warning_response_time` (Number) The warning response time threshold in millisonds.
+- `warning_response_time` (Number) The warning response time threshold in milliseconds.
 
 ### Optional
 

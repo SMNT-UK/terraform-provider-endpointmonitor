@@ -3,12 +3,12 @@
 page_title: "endpointmonitor_dns_check Resource - endpointmonitor"
 subcategory: ""
 description: |-
-  Create and manage DNS checks which check that a hostname reolves to an known set of addresses.
+  Create and manage DNS checks which check that a hostname revolves to a known set of addresses.
 ---
 
 # endpointmonitor_dns_check (Resource)
 
-Create and manage DNS checks which check that a hostname reolves to an known set of addresses.
+Create and manage DNS checks which check that a hostname revolves to a known set of addresses.
 
 ## Example Usage
 

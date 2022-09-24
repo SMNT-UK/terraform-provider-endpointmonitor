@@ -84,7 +84,7 @@ func urlCheck() *schema.Resource {
 			},
 			"warning_response_time": {
 				Type:         schema.TypeInt,
-				Description:  "The warning response time threshold in millisonds.",
+				Description:  "The warning response time threshold in milliseconds.",
 				Required:     true,
 				ValidateFunc: validatePositiveInt(),
 			},

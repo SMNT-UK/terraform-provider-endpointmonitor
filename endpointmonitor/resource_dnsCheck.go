@@ -11,7 +11,7 @@ import (
 
 func dnsCheck() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Create and manage DNS checks which check that a hostname reolves to an known set of addresses.",
+		Description:   "Create and manage DNS checks which check that a hostname revolves to a known set of addresses.",
 		CreateContext: resourceDNSCheckCreate,
 		ReadContext:   resourceDNSCheckRead,
 		UpdateContext: resourceDNSCheckUpdate,
