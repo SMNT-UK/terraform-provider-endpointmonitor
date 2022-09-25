@@ -13,3 +13,7 @@ data "endpointmonitor_check_host" "app_02" {
 data "endpointmonitor_check_group" "integration_tests" {
   search = "Integration Tests"
 }
+
+date "endpointmonitor_web_journey_common_step" "initial" {
+  search = "Initial Page Load Suppressions"
+}

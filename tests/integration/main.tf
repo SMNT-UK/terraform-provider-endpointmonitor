@@ -76,6 +76,24 @@ resource "endpointmonitor_socket_check" "integration_test" {
   check_group_id = data.endpointmonitor_check_group.integration_tests.id
 }
 
+resouce "endpointmonitor_web_journey_common_step" "initial" {
+  name                   = "Test Initial Common Step"
+  description            = "Generic Test Common Step"
+  wait_time              = 10000
+  page_load_time_warning = 2000
+  page_load_time_alert   = 5000
+
+  page_check {
+    description = "Terraform Test Common Step Check 1"
+    type        = "CHECK_FOR_TEXT"
+
+    check_for_text {
+      text_to_find = "Testing Text to Find"
+      state        = "PRESENT"
+    }
+  }
+}
+
 resource "endpointmonitor_web_journey_check" "integration_test" {
   name          = "Integration Web Journey Test"
   description   = "Integration Web Journey Test. Managed by Terraform."
@@ -97,7 +115,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
     sequence       = 0
     name           = "Initial Page Load Checks"
     type           = "COMMON"
-    common_step_id = data.endpointmonitor_web_journey_common_step.initial.id
+    common_step_id = endpointmonitor_web_journey_common_step.initial.id
   }
 
   step {
