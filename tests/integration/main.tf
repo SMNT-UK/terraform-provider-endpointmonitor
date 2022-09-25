@@ -137,8 +137,8 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
       type            = "PASSWORD_INPUT"
 
       password_input_action {
-        element_id = "login_password"
-        input_text = var.login_password
+        element_id     = "login_password"
+        input_password = var.login_password
       }
     }
 
