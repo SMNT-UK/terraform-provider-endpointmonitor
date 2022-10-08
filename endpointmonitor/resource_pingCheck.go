@@ -194,8 +194,8 @@ func mapPingCheck(d *schema.ResourceData) PingCheck {
 		CheckType:           "PING",
 		MaintenanceOverride: d.Get("maintenance_override").(bool),
 		Hostname:            d.Get("hostname").(string),
-		WarningRepsonseTime: d.Get("warning").(int),
-		Timeout:             d.Get("timeout").(int),
+		WarningRepsonseTime: d.Get("warning_response_time").(int),
+		Timeout:             d.Get("timeout_time").(int),
 		TriggerCount:        d.Get("trigger_count").(int),
 		ResultRetentionDays: d.Get("result_retention").(int),
 		CheckHost: CheckHost{
@@ -214,8 +214,8 @@ func mapPingCheckSchema(check PingCheck, d *schema.ResourceData) {
 	d.Set("enabled", check.Enabled)
 	d.Set("maintenance_override", check.MaintenanceOverride)
 	d.Set("hostname", check.Hostname)
-	d.Set("warning", check.WarningRepsonseTime)
-	d.Set("timeout", check.Timeout)
+	d.Set("warning_response_time", check.WarningRepsonseTime)
+	d.Set("timeout_time", check.Timeout)
 	d.Set("trigger_count", check.TriggerCount)
 	d.Set("result_retention", check.ResultRetentionDays)
 	d.Set("check_host_id", check.CheckHost.Id)
