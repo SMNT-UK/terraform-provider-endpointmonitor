@@ -15,5 +15,5 @@ data "endpointmonitor_check_group" "integration_tests" {
 }
 
 data "endpointmonitor_web_journey_common_step" "initial" {
-  search = "Initial Page Load Suppressions"
+  search = "Initial Page Load Suppressions SOURCE TEST"
 }
