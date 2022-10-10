@@ -1020,7 +1020,7 @@ func mapWebJourneyConsoleSuppression(suppression map[string]interface{}) *WebJou
 }
 
 func mapWebJourneyActions(rawActions *schema.Set) []*WebJourneyAction {
-	actions := make([]*WebJourneyAction, rawActions.Len())
+	actions := []*WebJourneyAction{}
 
 	for _, rawAction := range rawActions.List() {
 		action := rawAction.(map[string]interface{})
@@ -1031,7 +1031,7 @@ func mapWebJourneyActions(rawActions *schema.Set) []*WebJourneyAction {
 			Type:                          action["type"].(string),
 			WebJourneyClickAction:         mapWebJourneyClickAction(action["click_action"].(*schema.Set)),
 			WebJourneyTextInputAction:     mapWebJourneyTextInputAction(action["text_input_action"].(*schema.Set)),
-			WebJourneyPasswordInputAction: mapWebJourneyPasswordInputAction(action["text_input_action"].(*schema.Set)),
+			WebJourneyPasswordInputAction: mapWebJourneyPasswordInputAction(action["password_input_action"].(*schema.Set)),
 			WebJourneyChangeWindowByOrder: &WebJourneyChangeWindowByOrder{WindowId: action["window_id"].(int)},
 			WebJourneyChangeWindowByTitle: &WebJourneyChangeWindowByTitle{Title: action["window_title"].(string)},
 			WebJourneyNavigateToUrl:       &WebJourneyNavigateToUrl{action["navigate_url"].(string)},
@@ -1046,6 +1046,10 @@ func mapWebJourneyActions(rawActions *schema.Set) []*WebJourneyAction {
 }
 
 func mapWebJourneyClickAction(rawAction *schema.Set) *WebJourneyClickAction {
+	if len(rawAction.List()) < 1 {
+		return nil
+	}
+
 	action := rawAction.List()[0].(map[string]interface{})
 
 	return &WebJourneyClickAction{
@@ -1056,6 +1060,10 @@ func mapWebJourneyClickAction(rawAction *schema.Set) *WebJourneyClickAction {
 }
 
 func mapWebJourneyTextInputAction(rawAction *schema.Set) *WebJourneyTextInputAction {
+	if len(rawAction.List()) < 1 {
+		return nil
+	}
+
 	action := rawAction.List()[0].(map[string]interface{})
 
 	return &WebJourneyTextInputAction{
@@ -1067,6 +1075,10 @@ func mapWebJourneyTextInputAction(rawAction *schema.Set) *WebJourneyTextInputAct
 }
 
 func mapWebJourneyPasswordInputAction(rawAction *schema.Set) *WebJourneyPasswordInputAction {
+	if len(rawAction.List()) < 1 {
+		return nil
+	}
+
 	action := rawAction.List()[0].(map[string]interface{})
 
 	return &WebJourneyPasswordInputAction{
@@ -1078,6 +1090,10 @@ func mapWebJourneyPasswordInputAction(rawAction *schema.Set) *WebJourneyPassword
 }
 
 func mapWebJourneyScrollToElementAction(rawAction *schema.Set) *WebJourneyScrollToElement {
+	if len(rawAction.List()) < 1 {
+		return nil
+	}
+
 	action := rawAction.List()[0].(map[string]interface{})
 
 	return &WebJourneyScrollToElement{

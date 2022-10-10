@@ -77,8 +77,8 @@ resource "endpointmonitor_web_journey_check" "example" {
       type            = "PASSWORD_INPUT"
 
       password_input_action {
-        element_id = "login_password"
-        input_text = var.login_password
+        element_id     = "login_password"
+        input_password = var.login_password
       }
     }
 
@@ -86,7 +86,7 @@ resource "endpointmonitor_web_journey_check" "example" {
       sequence        = 2
       description     = "Click Login"
       always_required = true
-      type            = "PASSWORD_INPUT"
+      type            = "CLICK"
 
       click_action {
         search_text  = "Login"

@@ -131,9 +131,9 @@ type WebJourneyStep struct {
 	WaitTime            int                           `json:"waitTime"`
 	WarningPageLoadTime int                           `json:"warningPageLoadTime"`
 	AlertPageLoadTime   int                           `json:"alertPageLoadTime"`
-	PageChecks          []*WebJourneyPageCheck        `json:"pageChecks"`
-	AlertSuppressions   []*WebJourneyAlertSuppression `json:"alertSuppressions"`
-	Actions             []*WebJourneyAction           `json:"actions"`
+	PageChecks          []*WebJourneyPageCheck        `json:"pageChecks,omitempty"`
+	AlertSuppressions   []*WebJourneyAlertSuppression `json:"alertSuppressions,omitempty"`
+	Actions             []*WebJourneyAction           `json:"actions,omitempty"`
 }
 
 type WebJourneyCommonStep struct {
