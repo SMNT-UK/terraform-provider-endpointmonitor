@@ -146,7 +146,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
       sequence        = 2
       description     = "Click Login"
       always_required = true
-      type            = "PASSWORD_INPUT"
+      type            = "CLICK"
 
       click_action {
         search_text  = "Login"
