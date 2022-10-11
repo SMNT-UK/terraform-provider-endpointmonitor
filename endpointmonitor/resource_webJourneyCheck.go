@@ -846,6 +846,9 @@ func mapWebJourneySteps(d *schema.ResourceData) []WebJourneyStep {
 
 	for _, rawStep := range resourceSteps {
 		resourceStep := rawStep.(map[string]interface{})
+		suppressions := []*WebJourneyAlertSuppression{}
+		suppressions = append(suppressions, mapWebJourneyNetworkSuppressions(resourceStep["network_suppression"].(*schema.Set))...)
+		suppressions = append(suppressions, mapWebJourneyConsoleSuppressions(resourceStep["console_message_suppression"].(*schema.Set))...)
 
 		step := WebJourneyStep{
 			Id:                  stepId,
@@ -857,10 +860,8 @@ func mapWebJourneySteps(d *schema.ResourceData) []WebJourneyStep {
 			WarningPageLoadTime: resourceStep["page_load_time_warning"].(int),
 			AlertPageLoadTime:   resourceStep["page_load_time_alert"].(int),
 			PageChecks:          mapWebJourneyPageChecks(resourceStep["page_check"].(*schema.Set)),
-			AlertSuppressions: append(
-				mapWebJourneyNetworkSuppressions(resourceStep["network_suppression"].(*schema.Set)),
-				mapWebJourneyConsoleSuppressions(resourceStep["console_message_suppression"].(*schema.Set))...),
-			Actions: mapWebJourneyActions(resourceStep["action"].(*schema.Set)),
+			AlertSuppressions:   suppressions,
+			Actions:             mapWebJourneyActions(resourceStep["action"].(*schema.Set)),
 		}
 
 		steps = append(steps, step)
