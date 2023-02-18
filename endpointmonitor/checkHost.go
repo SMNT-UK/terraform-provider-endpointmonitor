@@ -11,9 +11,8 @@ import (
 
 type CheckHost struct {
 	Id                  int     `json:"id"`
-	Name                string  `json:"name"`
-	Description         string  `json:"description"`
 	Hostname            string  `json:"hostname"`
+	Description         string  `json:"description"`
 	Type                *string `json:"type"`
 	Enabled             bool    `json:"enabled"`
 	MaxWebJourneyChecks int     `json:"maxWebJourneyChecks"`

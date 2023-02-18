@@ -14,6 +14,7 @@ resource "endpointmonitor_dns_check" "example" {
   name               = "Loadbalancer Failure Check"
   description        = "Checks the load balancer hasn't automatically failed over."
   hostname           = "primary-website.mycompany.com"
+  check_frequency    = 300
   expected_addresses = ["1.2.3.4", "1.2.3.5"]
   trigger_count      = 3
   check_host_id      = data.endpointmonitor_check_host.controller.id

@@ -1,19 +1,17 @@
-# Example URL Check that uses the endpointmonitor_check_host and
-# endpointmonitor_check_group data sources to get the id of the 
-# group it sits in and the host it is to run on.
+# Example use of endpointmonitor_host_group to attach a 
+# check to a Check Host Group of all agents.
 
-data "endpointmonitor_check_host" "controller" {
-  search = "controller"
+data "endpointmonitor_host_group" "agents" {
+  search = "agents"
 }
 
 data "endpointmonitor_check_group" "websites" {
-  search = "Public Websites"
+  search = "Website Checks"
 }
 
 resource "endpointmonitor_url_check" "example" {
   name                   = "Home Page Check"
   description            = "Check home page loads as expected"
-  check_frequency        = 60
   url                    = "https://www.mycompany.com/"
   trigger_count          = 2
   request_method         = "GET"
@@ -21,13 +19,7 @@ resource "endpointmonitor_url_check" "example" {
   alert_response_time    = 5000
   warning_response_time  = 3000
   timeout                = 10000
-  allow_redirects        = false
 
-  request_header {
-    name  = "Agent"
-    value = "EndPoint Monitor"
-  }
-
-  check_host_id  = data.endpointmonitor_check_host.controller.id
+  host_group_id  = data.endpointmonitor_host_group.agents.id
   check_group_id = data.endpointmonitor_check_group.websites.id
 }

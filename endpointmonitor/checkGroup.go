@@ -10,11 +10,10 @@ import (
 )
 
 type CheckGroup struct {
-	Id             int      `json:"id"`
-	Name           string   `json:"name"`
-	Description    string   `json:"description"`
-	CheckFrequency int      `json:"checkFrequecy"`
-	AppGroup       AppGroup `json:"appGroup"`
+	Id          int      `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	AppGroup    AppGroup `json:"appGroup"`
 }
 
 func (c *Client) SearchCheckGroups(search string) (*[]CheckGroup, error) {

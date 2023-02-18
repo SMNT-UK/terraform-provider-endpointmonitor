@@ -38,6 +38,13 @@ func socketCheck() *schema.Resource {
 				Optional:    true,
 				Default:     true,
 			},
+			"check_frequency": {
+				Type:         schema.TypeInt,
+				Description:  "The frequency the check will be run in seconds.",
+				Optional:     true,
+				Default:      60,
+				ValidateFunc: validatePositiveInt(),
+			},
 			"maintenance_override": {
 				Type:        schema.TypeBool,
 				Description: "If set true then notifications and alerts will be suppressed for the check.",
@@ -83,7 +90,7 @@ func socketCheck() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }
@@ -185,6 +192,7 @@ func mapSocketCheck(d *schema.ResourceData) SocketCheck {
 		Name:                d.Get("name").(string),
 		Description:         d.Get("description").(string),
 		Enabled:             d.Get("enabled").(bool),
+		CheckFrequency:      d.Get("check_frequency").(int),
 		CheckType:           "SOCKET",
 		MaintenanceOverride: d.Get("maintenance_override").(bool),
 		Hostname:            d.Get("hostname").(string),
@@ -205,6 +213,7 @@ func mapSocketCheckSchema(check SocketCheck, d *schema.ResourceData) {
 	d.Set("name", check.Name)
 	d.Set("description", check.Description)
 	d.Set("enabled", check.Enabled)
+	d.Set("check_frequency", check.CheckFrequency)
 	d.Set("maintenance_override", check.MaintenanceOverride)
 	d.Set("hostname", check.Hostname)
 	d.Set("port", check.Port)

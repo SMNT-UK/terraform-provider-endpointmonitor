@@ -12,7 +12,7 @@ terraform {
 }
 
 provider "endpointmonitor" {
-  url = "https://smnt-read-epm.net.smnt.co.uk/api"
+  url = "https://smnt-edin-epm.net.smnt.co.uk/api"
 }
 
 resource "endpointmonitor_app_group" "integration_tests" {
@@ -23,7 +23,6 @@ resource "endpointmonitor_app_group" "integration_tests" {
 resource "endpointmonitor_check_group" "integration_tests" {
   name            = "Integration Tests"
   description     = "Integration test checks. Managed by Terraform."
-  check_frequency = 120
   app_group_id    = endpointmonitor_app_group.integration_tests.id
 }
 
@@ -47,6 +46,7 @@ resource "endpointmonitor_url_check" "integration_test" {
 resource "endpointmonitor_dns_check" "integration_test" {
   name               = "Integration DNS Test"
   description        = "Integeration DNS Test. Managed by Terraform."
+  check_frequency    = 300
   hostname           = "one.one.one.one"
   expected_addresses = ["1.0.0.1", "1.1.1.1"]
   trigger_count      = 2
@@ -55,33 +55,36 @@ resource "endpointmonitor_dns_check" "integration_test" {
 }
 
 resource "endpointmonitor_ping_check" "integration_test" {
-  name           = "Intgration Ping Test"
-  description    = "Integration Ping Test. Managed by Terraform."
-  hostname       = "bbc.co.uk"
-  trigger_count  = 3
-  check_host_id  = data.endpointmonitor_check_host.epm_01.id
-  check_group_id = data.endpointmonitor_check_group.integration_tests.id
+  name            = "Intgration Ping Test"
+  description     = "Integration Ping Test. Managed by Terraform."
+  check_frequency = 30
+  hostname        = "bbc.co.uk"
+  trigger_count   = 3
+  check_host_id   = data.endpointmonitor_check_host.epm_01.id
+  check_group_id  = data.endpointmonitor_check_group.integration_tests.id
 
   warning_response_time = 2000
   timeout_time          = 5000
 }
 
 resource "endpointmonitor_socket_check" "integration_test" {
-  name           = "Integration Socket Test"
-  description    = "Integration Socket Test. Managed by Terraform."
-  hostname       = "lttstore.co.uk"
-  port           = 443
-  trigger_count  = 2
-  check_host_id  = data.endpointmonitor_check_host.epm_01.id
-  check_group_id = data.endpointmonitor_check_group.integration_tests.id
+  name            = "Integration Socket Test"
+  description     = "Integration Socket Test. Managed by Terraform."
+  check_frequency = 120
+  hostname        = "lttstore.co.uk"
+  port            = 443
+  trigger_count   = 2
+  check_host_id   = data.endpointmonitor_check_host.epm_01.id
+  check_group_id  = data.endpointmonitor_check_group.integration_tests.id
 }
 
 resource "endpointmonitor_web_journey_check" "integration_test" {
-  name          = "Integration Web Journey Test"
-  description   = "Integration Web Journey Test. Managed by Terraform."
-  enabled       = true
-  start_url     = "https://koolness.co.uk/test/"
-  trigger_count = 3
+  name            = "Integration Web Journey Test"
+  description     = "Integration Web Journey Test. Managed by Terraform."
+  check_frequency = 120
+  enabled         = true
+  start_url       = "https://koolness.co.uk/test/"
+  trigger_count   = 3
 
   monitor_domain {
     domain              = "mycompany.com"
@@ -124,7 +127,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
       always_required = true
       type            = "TEXT_INPUT"
 
-      text_input_action {
+      text_input {
         element_id = "login_username"
         input_text = "my.user@mycompany.com"
       }
@@ -136,7 +139,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
       always_required = true
       type            = "PASSWORD_INPUT"
 
-      password_input_action {
+      password_input {
         element_id     = "login_password"
         input_password = var.login_password
       }
@@ -148,7 +151,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
       always_required = true
       type            = "CLICK"
 
-      click_action {
+      click {
         search_text  = "Login"
         element_type = "button"
       }

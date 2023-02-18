@@ -11,10 +11,11 @@ data "endpointmonitor_check_group" "database" {
 }
 
 resource "endpointmonitor_socket_check" "example" {
-  name           = "Primary Database Listening"
-  hostname       = "db01.internal.mycompany.com"
-  port           = 5432
-  trigger_count  = 2
-  check_host_id  = data.endpointmonitor_check_host.controller.id
-  check_group_id = data.endpointmonitor_check_group.database.id
+  name            = "Primary Database Listening"
+  hostname        = "db01.internal.mycompany.com"
+  check_frequency = 30
+  port            = 5432
+  trigger_count   = 2
+  check_host_id   = data.endpointmonitor_check_host.controller.id
+  check_group_id  = data.endpointmonitor_check_group.database.id
 }

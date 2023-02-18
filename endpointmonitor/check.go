@@ -19,7 +19,9 @@ type Check struct {
 	Enabled             bool       `json:"enabled"`
 	MaintenanceOverride bool       `json:"maintenanceOverride"`
 	CheckType           string     `json:"checkType"`
+	CheckFrequency      int        `json:"checkFrequency"`
 	CheckHost           CheckHost  `json:"checkHost"`
+	HostGroup           HostGroup  `json:"hostGroup"`
 	CheckGroup          CheckGroup `json:"checkGroup"`
 }
 
@@ -29,6 +31,7 @@ type URLCheck struct {
 	Description          string          `json:"description"`
 	Enabled              bool            `json:"enabled"`
 	CheckType            string          `json:"checkType"`
+	CheckFrequency       int             `json:"checkFrequency"`
 	MaintenanceOverride  bool            `json:"maintenanceOverride"`
 	URL                  string          `json:"url"`
 	TriggerCount         int             `json:"triggerCount"`
@@ -43,6 +46,7 @@ type URLCheck struct {
 	RequestHeaders       []RequestHeader `json:"requestHeaders"`
 	CheckStrings         []CheckString   `json:"checkStrings"`
 	CheckHost            CheckHost       `json:"checkHost"`
+	HostGroup            HostGroup       `json:"hostGroup"`
 	CheckGroup           CheckGroup      `json:"checkGroup"`
 	ProxyHost            *ProxyHost      `json:"proxyHost"`
 }
@@ -58,12 +62,14 @@ type SocketCheck struct {
 	Description         string     `json:"description"`
 	Enabled             bool       `json:"enabled"`
 	CheckType           string     `json:"checkType"`
+	CheckFrequency      int        `json:"checkFrequency"`
 	MaintenanceOverride bool       `json:"maintenanceOverride"`
 	Hostname            string     `json:"hostname"`
 	Port                int        `json:"port"`
 	TriggerCount        int        `json:"triggerCount"`
 	ResultRetentionDays int        `json:"resultRetentionDays"`
 	CheckHost           CheckHost  `json:"checkHost"`
+	HostGroup           HostGroup  `json:"hostGroup"`
 	CheckGroup          CheckGroup `json:"checkGroup"`
 }
 
@@ -73,12 +79,14 @@ type DNSCheck struct {
 	Description         string     `json:"description"`
 	Enabled             bool       `json:"enabled"`
 	CheckType           string     `json:"checkType"`
+	CheckFrequency      int        `json:"checkFrequency"`
 	MaintenanceOverride bool       `json:"maintenanceOverride"`
 	Hostname            string     `json:"hostname"`
 	ExpectedAddresses   []string   `json:"expectedAddresses"`
 	TriggerCount        int        `json:"triggerCount"`
 	ResultRetentionDays int        `json:"resultRetentionDays"`
 	CheckHost           CheckHost  `json:"checkHost"`
+	HostGroup           HostGroup  `json:"hostGroup"`
 	CheckGroup          CheckGroup `json:"checkGroup"`
 }
 
@@ -88,6 +96,7 @@ type PingCheck struct {
 	Description         string     `json:"description"`
 	Enabled             bool       `json:"enabled"`
 	CheckType           string     `json:"checkType"`
+	CheckFrequency      int        `json:"checkFrequency"`
 	MaintenanceOverride bool       `json:"maintenanceOverride"`
 	Hostname            string     `json:"hostname"`
 	WarningRepsonseTime int        `json:"warningResponseTime"`
@@ -95,6 +104,7 @@ type PingCheck struct {
 	TriggerCount        int        `json:"triggerCount"`
 	ResultRetentionDays int        `json:"resultRetentionDays"`
 	CheckHost           CheckHost  `json:"checkHost"`
+	HostGroup           HostGroup  `json:"hostGroup"`
 	CheckGroup          CheckGroup `json:"checkGroup"`
 }
 
@@ -104,6 +114,7 @@ type WebJourneyCheck struct {
 	Description         string           `json:"description"`
 	Enabled             bool             `json:"enabled"`
 	CheckType           string           `json:"checkType"`
+	CheckFrequency      int              `json:"checkFrequency"`
 	MaintenanceOverride bool             `json:"maintenanceOverride"`
 	StartURL            string           `json:"startUrl"`
 	TriggerCount        int              `json:"triggerCount"`
@@ -113,6 +124,7 @@ type WebJourneyCheck struct {
 	MonitorDomains      []MonitorDomain  `json:"monitorDomains"`
 	Steps               []WebJourneyStep `json:"steps"`
 	CheckHost           CheckHost        `json:"checkHost"`
+	HostGroup           HostGroup        `json:"hostGroup"`
 	CheckGroup          CheckGroup       `json:"checkGroup"`
 	ProxyHost           *ProxyHost       `json:"proxyHost"`
 }
@@ -243,6 +255,7 @@ type WebJourneyAction struct {
 	WebJourneySelectIframeByOrder *WebJourneySelectIframeByOrder `json:"webJourneySelectIframeByOrder"`
 	WebJourneySelectIframeByXpath *WebJourneySelectIframeByXpath `json:"webJourneySelectIframeByXpath"`
 	WebJourneyScrollToElement     *WebJourneyScrollToElement     `json:"webJourneyScrollToElement"`
+	WebJourneySelectOption        *WebJourneySelectOption        `json:"webJourneySelectOption"`
 }
 
 type WebJourneyClickAction struct {
@@ -293,6 +306,14 @@ type WebJourneyScrollToElement struct {
 	Xpath       string `json:"xpath"`
 	SearchText  string `json:"searchText"`
 	ElementType string `json:"elementType"`
+}
+
+type WebJourneySelectOption struct {
+	ElementId   string `json:"elementId"`
+	Xpath       string `json:"xapth"`
+	OptionIndex int    `json:"optionIndex"`
+	OptionName  string `json:"optionName"`
+	OptionValue string `json:"optionValue"`
 }
 
 type RequestHeader struct {

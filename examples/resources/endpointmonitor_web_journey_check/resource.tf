@@ -17,11 +17,12 @@ data "endpointmonitor_web_journey_common_step" "initial" {
 }
 
 resource "endpointmonitor_web_journey_check" "example" {
-  name          = "Website Login"
-  description   = "Checks website login is working."
-  enabled       = true
-  start_url     = "https://www.mycompany.com/"
-  trigger_count = 2
+  name            = "Website Login"
+  description     = "Checks website login is working."
+  enabled         = true
+  check_frequency = 120
+  start_url       = "https://www.mycompany.com/"
+  trigger_count   = 2
 
   monitor_domain {
     domain              = "mycompany.com"
@@ -64,7 +65,7 @@ resource "endpointmonitor_web_journey_check" "example" {
       always_required = true
       type            = "TEXT_INPUT"
 
-      text_input_action {
+      text_input {
         element_id = "login_username"
         input_text = "my.user@mycompany.com"
       }
@@ -76,7 +77,7 @@ resource "endpointmonitor_web_journey_check" "example" {
       always_required = true
       type            = "PASSWORD_INPUT"
 
-      password_input_action {
+      password_input {
         element_id     = "login_password"
         input_password = var.login_password
       }
@@ -88,7 +89,7 @@ resource "endpointmonitor_web_journey_check" "example" {
       always_required = true
       type            = "CLICK"
 
-      click_action {
+      click {
         search_text  = "Login"
         element_type = "button"
       }

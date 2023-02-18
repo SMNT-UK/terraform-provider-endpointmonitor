@@ -38,6 +38,13 @@ func webJourneyCheck() *schema.Resource {
 				Optional:    true,
 				Default:     true,
 			},
+			"check_frequency": {
+				Type:         schema.TypeInt,
+				Description:  "The frequency the check will be run in seconds.",
+				Optional:     true,
+				Default:      60,
+				ValidateFunc: validatePositiveInt(),
+			},
 			"maintenance_override": {
 				Type:        schema.TypeBool,
 				Description: "If set true then notifications and alerts will be suppressed for the check.",
@@ -486,11 +493,11 @@ func webJourneyCheck() *schema.Resource {
 									},
 									"type": {
 										Type:         schema.TypeString,
-										Description:  "The type of action to perform. Options are: CLICK, DOUBLE_CLICK, RIGHT_CLICK, TEXT_INPUT, PASSWORD_INPUT, CHANGE_WINDOW_BY_ORDER, CHANGE_WINDOW_BY_TITLE, NAVIGATE_URL, WAIT, REFRESH_PAGE, CLOSE_WINDOW, CHANGE_IFRAME_BY_ORDER, CHANGE_IFRAME_BY_XPATH, SCROLL_TO_ELEMENT, TAKE_SCREENSHOT or SAVE_DOM.",
+										Description:  "The type of action to perform. Options are: CLICK, DOUBLE_CLICK, RIGHT_CLICK, TEXT_INPUT, PASSWORD_INPUT, CHANGE_WINDOW_BY_ORDER, CHANGE_WINDOW_BY_TITLE, NAVIGATE_URL, WAIT, REFRESH_PAGE, CLOSE_WINDOW, CHANGE_IFRAME_BY_ORDER, CHANGE_IFRAME_BY_XPATH, SCROLL_TO_ELEMENT, TAKE_SCREENSHOT, SAVE_DOM or SELECT_OPTION.",
 										Required:     true,
 										ValidateFunc: validateWebJourneyStepActionType(),
 									},
-									"click_action": {
+									"click": {
 										Type:        schema.TypeSet,
 										Description: "The additional details needed for a CLICK, DOUBLE_CLICK or RIGHT_CLICK action type.",
 										Optional:    true,
@@ -518,7 +525,7 @@ func webJourneyCheck() *schema.Resource {
 											},
 										},
 									},
-									"text_input_action": {
+									"text_input": {
 										Type:        schema.TypeSet,
 										Description: "The additional details needed for a TEXT_INPUT action type.",
 										Optional:    true,
@@ -552,7 +559,7 @@ func webJourneyCheck() *schema.Resource {
 											},
 										},
 									},
-									"password_input_action": {
+									"password_input": {
 										Type:        schema.TypeSet,
 										Description: "The additional details needed for a PASSWORD_INPUT action type.",
 										Optional:    true,
@@ -651,6 +658,46 @@ func webJourneyCheck() *schema.Resource {
 											},
 										},
 									},
+									"select_option": {
+										Type:        schema.TypeSet,
+										Description: "Additional details needed for SELECT_OPTION action type, used to choose a value from a select element.",
+										Optional:    true,
+										MaxItems:    1,
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"element_id": {
+													Type:         schema.TypeString,
+													Description:  "The id of the select element to select a value from. Not to be used when xpath is set.",
+													Optional:     true,
+													ValidateFunc: validation.StringIsNotEmpty,
+												},
+												"xpath": {
+													Type:         schema.TypeString,
+													Description:  "The xpath of the select element to select a value from. Not to be used when element_id is set.",
+													Optional:     true,
+													ValidateFunc: validation.StringIsNotEmpty,
+												},
+												"option_index": {
+													Type:         schema.TypeInt,
+													Description:  "Choose the option to select by the order it is shown in the list, starting from 0.",
+													Optional:     true,
+													ValidateFunc: validatePositiveInt(),
+												},
+												"option_name": {
+													Type:         schema.TypeString,
+													Description:  "Choose the option to select by its name shown in the list.",
+													Optional:     true,
+													ValidateFunc: validation.StringIsNotEmpty,
+												},
+												"option_value": {
+													Type:         schema.TypeString,
+													Description:  "Choose the option to select by its form value.",
+													Optional:     true,
+													ValidateFunc: validation.StringIsNotEmpty,
+												},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -678,7 +725,7 @@ func webJourneyCheck() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }
@@ -780,6 +827,7 @@ func mapWebJourneyCheck(d *schema.ResourceData) WebJourneyCheck {
 		Name:                d.Get("name").(string),
 		Description:         d.Get("description").(string),
 		Enabled:             d.Get("enabled").(bool),
+		CheckFrequency:      d.Get("check_frequency").(int),
 		CheckType:           "WEB_JOURNEY",
 		MaintenanceOverride: d.Get("maintenance_override").(bool),
 		StartURL:            d.Get("start_url").(string),
@@ -1030,9 +1078,9 @@ func mapWebJourneyActions(rawActions *schema.Set) []*WebJourneyAction {
 			Description:                   action["description"].(string),
 			AlwaysRequired:                action["always_required"].(bool),
 			Type:                          action["type"].(string),
-			WebJourneyClickAction:         mapWebJourneyClickAction(action["click_action"].(*schema.Set)),
-			WebJourneyTextInputAction:     mapWebJourneyTextInputAction(action["text_input_action"].(*schema.Set)),
-			WebJourneyPasswordInputAction: mapWebJourneyPasswordInputAction(action["password_input_action"].(*schema.Set)),
+			WebJourneyClickAction:         mapWebJourneyClickAction(action["click"].(*schema.Set)),
+			WebJourneyTextInputAction:     mapWebJourneyTextInputAction(action["text_input"].(*schema.Set)),
+			WebJourneyPasswordInputAction: mapWebJourneyPasswordInputAction(action["password_input"].(*schema.Set)),
 			WebJourneyChangeWindowByOrder: &WebJourneyChangeWindowByOrder{WindowId: action["window_id"].(int)},
 			WebJourneyChangeWindowByTitle: &WebJourneyChangeWindowByTitle{Title: action["window_title"].(string)},
 			WebJourneyNavigateToUrl:       &WebJourneyNavigateToUrl{action["navigate_url"].(string)},
@@ -1040,6 +1088,7 @@ func mapWebJourneyActions(rawActions *schema.Set) []*WebJourneyAction {
 			WebJourneySelectIframeByOrder: &WebJourneySelectIframeByOrder{action["iframe_id"].(int)},
 			WebJourneySelectIframeByXpath: &WebJourneySelectIframeByXpath{action["iframe_xpath"].(string)},
 			WebJourneyScrollToElement:     mapWebJourneyScrollToElementAction(action["scroll_to_element"].(*schema.Set)),
+			WebJourneySelectOption:        mapWebJourneySelectOptionAction(action["select_option"].(*schema.Set)),
 		})
 	}
 
@@ -1104,6 +1153,22 @@ func mapWebJourneyScrollToElementAction(rawAction *schema.Set) *WebJourneyScroll
 	}
 }
 
+func mapWebJourneySelectOptionAction(rawAction *schema.Set) *WebJourneySelectOption {
+	if len(rawAction.List()) < 1 {
+		return nil
+	}
+
+	action := rawAction.List()[0].(map[string]interface{})
+
+	return &WebJourneySelectOption{
+		ElementId:   action["elementId"].(string),
+		Xpath:       action["xpath"].(string),
+		OptionIndex: action["option_index"].(int),
+		OptionName:  action["option_name"].(string),
+		OptionValue: action["option_value"].(string),
+	}
+}
+
 func mapWebJourneyCheckSchema(check WebJourneyCheck, d *schema.ResourceData) {
 	if check.ProxyHost != nil {
 		d.Set("proxy_host_id", check.ProxyHost.Id)
@@ -1113,6 +1178,7 @@ func mapWebJourneyCheckSchema(check WebJourneyCheck, d *schema.ResourceData) {
 	d.Set("name", check.Name)
 	d.Set("description", check.Description)
 	d.Set("enabled", check.Enabled)
+	d.Set("check_frequency", check.CheckFrequency)
 	d.Set("mainteance_override", check.MaintenanceOverride)
 	d.Set("startUrl", check.StartURL)
 	d.Set("trigger_count", check.TriggerCount)
@@ -1208,7 +1274,7 @@ func mapWebJourneyActionSchema(actions []*WebJourneyAction) []map[string]interfa
 			clickSchema["element_type"] = action.WebJourneyClickAction.ElementType
 			clickSchema["search_text"] = action.WebJourneyClickAction.SearchText
 			clickSchema["xpath"] = action.WebJourneyClickAction.Xpath
-			actionSchema["click_action"] = clickSchema
+			actionSchema["click"] = clickSchema
 			break
 		case "TEXT_INPUT":
 			textInputSchema := make(map[string]interface{})
@@ -1216,7 +1282,7 @@ func mapWebJourneyActionSchema(actions []*WebJourneyAction) []map[string]interfa
 			textInputSchema["element_id"] = action.WebJourneyTextInputAction.ElementId
 			textInputSchema["element_name"] = action.WebJourneyTextInputAction.ElementName
 			textInputSchema["xpath"] = action.WebJourneyTextInputAction.Xpath
-			actionSchema["text_input_action"] = textInputSchema
+			actionSchema["text_input"] = textInputSchema
 			break
 		case "PASSWORD_INPUT":
 			passwordInputSchema := make(map[string]interface{})
@@ -1224,7 +1290,7 @@ func mapWebJourneyActionSchema(actions []*WebJourneyAction) []map[string]interfa
 			passwordInputSchema["element_id"] = action.WebJourneyPasswordInputAction.ElementId
 			passwordInputSchema["element_name"] = action.WebJourneyPasswordInputAction.ElementName
 			passwordInputSchema["xpath"] = action.WebJourneyPasswordInputAction.Xpath
-			actionSchema["password_input_action"] = passwordInputSchema
+			actionSchema["password_input"] = passwordInputSchema
 			break
 		case "CHANGE_WINDOW_BY_ORDER":
 			actionSchema["window_id"] = action.WebJourneyChangeWindowByOrder.WindowId
@@ -1250,6 +1316,14 @@ func mapWebJourneyActionSchema(actions []*WebJourneyAction) []map[string]interfa
 			elementScrollSchema["search_text"] = action.WebJourneyScrollToElement.SearchText
 			elementScrollSchema["xpath"] = action.WebJourneyScrollToElement.Xpath
 			actionSchema["scroll_to_element"] = elementScrollSchema
+			break
+		case "SELECT_OPTION":
+			selectOptionSchema := make(map[string]interface{})
+			selectOptionSchema["elementId"] = action.WebJourneySelectOption.ElementId
+			selectOptionSchema["xpath"] = action.WebJourneySelectOption.Xpath
+			selectOptionSchema["optionIndex"] = action.WebJourneySelectOption.OptionIndex
+			selectOptionSchema["optionName"] = action.WebJourneySelectOption.OptionName
+			selectOptionSchema["optionValue"] = action.WebJourneySelectOption.OptionValue
 			break
 		}
 	}
@@ -1334,6 +1408,7 @@ func validateWebJourneyStepActionType() schema.SchemaValidateFunc {
 		"SCROLL_TO_ELEMENT",
 		"TAKE_SCREENSHOT",
 		"SAVE_DOM",
+		"SELECT_OPTION",
 	}
 	return validation.StringInSlice(types, false)
 }

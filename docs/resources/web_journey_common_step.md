@@ -16,7 +16,7 @@ Create and manage web journey common steps which are used to provide common chec
 # Example Web Journey Common Step of setting up a common set of checks, 
 # actions and suppressions that could be used at the start of each 
 # web journey check for a site to remove duplication and make changes 
-# across multiple checks easier to accomplish.
+# accross multiple checks easier to accomplish.
 
 resource "endpointmonitor_web_journey_common_step" "example" {
   name                   = "Initial Page Load"
@@ -39,7 +39,7 @@ resource "endpointmonitor_web_journey_common_step" "example" {
     description = "Ignore error from 3rd party marketing script."
     log_level   = "ERROR"
     comparison  = "STARTS_WITH"
-    message     = "Generic Marketing Company encountered an error when"
+    message     = "Generic Marketing Compnay encountered an error when"
   }
 
   network_suppression {

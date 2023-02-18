@@ -41,7 +41,7 @@ resource "endpointmonitor_web_journey_common_step" "example" {
     always_required = false
     type            = "CLICK"
 
-    click_action {
+    click {
       xpath = "//*[@class='aria-close']"
     }
   }
@@ -52,7 +52,7 @@ resource "endpointmonitor_web_journey_common_step" "example" {
     always_required = true
     type            = "CLICK"
 
-    click_action {
+    click {
       search_text  = "Accept All"
       element_type = "button"
     }

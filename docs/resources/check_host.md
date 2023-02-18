@@ -32,7 +32,6 @@ resource "endpointmonitor_check_host" "example" {
 - `description` (String) A place to provide more detail about the host if required.
 - `enabled` (Boolean) If disabled checks set to run against this host will be paused.
 - `hostname` (String) The hostname of the host. Must match what the host believes its own hostname is.
-- `name` (String) A friendly name to describe the host. This is what the host will be referred to as on all screens and alerts.
 - `type` (String) Must be either CONTROLLER or AGENT. CONTROLLER is used for hosts that expose the Web GUI and required database access. AGENT is used for hosts that purely just run checks.
 
 ### Optional

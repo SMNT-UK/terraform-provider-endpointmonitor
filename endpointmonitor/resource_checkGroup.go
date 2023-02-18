@@ -30,11 +30,6 @@ func checkGroup() *schema.Resource {
 				Description: "A space to provide a longer description of this group.",
 				Required:    true,
 			},
-			"check_frequency": {
-				Type:        schema.TypeInt,
-				Description: "The frequency in seconds that checks within this group should be run.",
-				Required:    true,
-			},
 			"app_group_id": {
 				Type:        schema.TypeInt,
 				Description: "The id of the App Group this belongs to.",
@@ -42,7 +37,7 @@ func checkGroup() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }
@@ -140,10 +135,9 @@ func mapCheckGroup(d *schema.ResourceData) CheckGroup {
 	}
 
 	return CheckGroup{
-		Id:             checkGroupId,
-		Name:           d.Get("name").(string),
-		Description:    d.Get("description").(string),
-		CheckFrequency: d.Get("check_frequency").(int),
+		Id:          checkGroupId,
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
 		AppGroup: AppGroup{
 			Id: d.Get("app_group_id").(int),
 		},
@@ -154,6 +148,5 @@ func mapCheckGroupSchema(checkGroup CheckGroup, d *schema.ResourceData) {
 	d.SetId(strconv.Itoa(checkGroup.Id))
 	d.Set("name", checkGroup.Name)
 	d.Set("description", checkGroup.Description)
-	d.Set("check_frequency", checkGroup.CheckFrequency)
 	d.Set("app_group_id", checkGroup.AppGroup.Id)
 }

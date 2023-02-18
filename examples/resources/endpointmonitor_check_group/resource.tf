@@ -8,6 +8,5 @@ data "endpointmonitor_app_group" "example" {
 resource "endpointmonitor_check_group" "example" {
   name            = "Main Company Website"
   description     = "Contains checks for the main company website."
-  check_frequency = 60
   app_group_id    = endpointmonitor_app_group.example.id
 }

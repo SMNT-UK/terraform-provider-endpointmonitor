@@ -392,7 +392,7 @@ func webJourneyCommonStep() *schema.Resource {
 							Required:     true,
 							ValidateFunc: validateWebJourneyStepActionType(),
 						},
-						"click_action": {
+						"click": {
 							Type:        schema.TypeSet,
 							Description: "The additional details needed for a CLICK, DOUBLE_CLICK or RIGHT_CLICK action type.",
 							Optional:    true,
@@ -420,7 +420,7 @@ func webJourneyCommonStep() *schema.Resource {
 								},
 							},
 						},
-						"text_input_action": {
+						"text_input": {
 							Type:        schema.TypeSet,
 							Description: "The additional details needed for a TEXT_INPUT action type.",
 							Optional:    true,
@@ -454,7 +454,7 @@ func webJourneyCommonStep() *schema.Resource {
 								},
 							},
 						},
-						"password_input_action": {
+						"password_input": {
 							Type:        schema.TypeSet,
 							Description: "The additional details needed for a PASSWORD_INPUT action type.",
 							Optional:    true,
@@ -558,7 +558,7 @@ func webJourneyCommonStep() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }

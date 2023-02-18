@@ -11,11 +11,12 @@ data "endpointmonitor_check_group" "network" {
 }
 
 resource "endpointmonitor_ping_check" "example" {
-  name           = "Ping Access Point 1"
-  hostname       = "ap01.internal.mycompany.com"
-  trigger_count  = 3
-  check_host_id  = data.endpointmonitor_check_host.controller.id
-  check_group_id = data.endpointmonitor_check_group.network.id
+  name            = "Ping Access Point 1"
+  hostname        = "ap01.internal.mycompany.com"
+  check_frequency = 30
+  trigger_count   = 3
+  check_host_id   = data.endpointmonitor_check_host.controller.id
+  check_group_id  = data.endpointmonitor_check_group.network.id
 
   warning_response_time = 2000
   timeout_time          = 5000

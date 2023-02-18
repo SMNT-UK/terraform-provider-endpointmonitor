@@ -38,6 +38,13 @@ func dnsCheck() *schema.Resource {
 				Optional:    true,
 				Default:     true,
 			},
+			"check_frequency": {
+				Type:         schema.TypeInt,
+				Description:  "The frequency the check will be run in seconds.",
+				Optional:     true,
+				Default:      60,
+				ValidateFunc: validatePositiveInt(),
+			},
 			"maintenance_override": {
 				Type:        schema.TypeBool,
 				Description: "If set true then notifications and alerts will be suppressed for the check.",
@@ -75,7 +82,13 @@ func dnsCheck() *schema.Resource {
 			"check_host_id": {
 				Type:         schema.TypeInt,
 				Description:  "The id of the Check Host to run the check on.",
-				Required:     true,
+				Optional:     true,
+				ValidateFunc: validatePositiveInt(),
+			},
+			"host_group_id": {
+				Type:         schema.TypeInt,
+				Description:  "The id of a Check Group Group to run the check on.",
+				Optional:     true,
 				ValidateFunc: validatePositiveInt(),
 			},
 			"check_group_id": {
@@ -86,7 +99,7 @@ func dnsCheck() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }
@@ -195,6 +208,7 @@ func mapDNSCheck(d *schema.ResourceData) DNSCheck {
 		Name:                d.Get("name").(string),
 		Description:         d.Get("description").(string),
 		Enabled:             d.Get("enabled").(bool),
+		CheckFrequency:      d.Get("check_frequency").(int),
 		CheckType:           "DNS",
 		MaintenanceOverride: d.Get("maintenance_override").(bool),
 		Hostname:            d.Get("hostname").(string),
@@ -203,6 +217,9 @@ func mapDNSCheck(d *schema.ResourceData) DNSCheck {
 		ResultRetentionDays: d.Get("result_retention").(int),
 		CheckHost: CheckHost{
 			Id: d.Get("check_host_id").(int),
+		},
+		HostGroup: HostGroup{
+			Id: d.Get("host_group_id").(int),
 		},
 		CheckGroup: CheckGroup{
 			Id: d.Get("check_group_id").(int),
@@ -215,11 +232,13 @@ func mapDNSCheckSchema(check DNSCheck, d *schema.ResourceData) {
 	d.Set("name", check.Name)
 	d.Set("description", check.Description)
 	d.Set("enabled", check.Enabled)
+	d.Set("check_frequency", check.CheckFrequency)
 	d.Set("maintenance_override", check.MaintenanceOverride)
 	d.Set("hostname", check.Hostname)
 	d.Set("expected_addresses", check.ExpectedAddresses)
 	d.Set("trigger_count", check.TriggerCount)
 	d.Set("result_retention", check.ResultRetentionDays)
 	d.Set("check_host_id", check.CheckHost.Id)
+	d.Set("host_group_id", check.HostGroup.Id)
 	d.Set("check_group_id", check.CheckGroup.Id)
 }

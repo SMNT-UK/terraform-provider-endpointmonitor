@@ -39,6 +39,13 @@ func urlCheck() *schema.Resource {
 				Optional:    true,
 				Default:     true,
 			},
+			"check_frequency": {
+				Type:         schema.TypeInt,
+				Description:  "The frequency the check will be run in seconds.",
+				Optional:     true,
+				Default:      60,
+				ValidateFunc: validatePositiveInt(),
+			},
 			"maintenance_override": {
 				Type:        schema.TypeBool,
 				Description: "If set true then notifications and alerts will be suppressed for the check.",
@@ -164,7 +171,7 @@ func urlCheck() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }
@@ -288,6 +295,7 @@ func mapUrlCheck(d *schema.ResourceData) URLCheck {
 		Name:                 d.Get("name").(string),
 		Description:          d.Get("description").(string),
 		Enabled:              d.Get("enabled").(bool),
+		CheckFrequency:       d.Get("check_frequency").(int),
 		CheckType:            "URL",
 		MaintenanceOverride:  d.Get("maintenance_override").(bool),
 		URL:                  d.Get("url").(string),
@@ -324,6 +332,7 @@ func mapUrlCheckSchema(check URLCheck, d *schema.ResourceData) {
 	d.Set("name", check.Name)
 	d.Set("description", check.Description)
 	d.Set("enabled", check.Enabled)
+	d.Set("check_frequency", check.CheckFrequency)
 	d.Set("maintenance_override", check.MaintenanceOverride)
 	d.Set("url", check.URL)
 	d.Set("trigger_count", check.TriggerCount)

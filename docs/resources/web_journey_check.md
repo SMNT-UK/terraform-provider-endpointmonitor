@@ -92,8 +92,8 @@ resource "endpointmonitor_web_journey_check" "example" {
       type            = "PASSWORD_INPUT"
 
       password_input_action {
-        element_id = "login_password"
-        input_text = var.login_password
+        element_id     = "login_password"
+        input_password = var.login_password
       }
     }
 
@@ -101,7 +101,7 @@ resource "endpointmonitor_web_journey_check" "example" {
       sequence        = 2
       description     = "Click Login"
       always_required = true
-      type            = "PASSWORD_INPUT"
+      type            = "CLICK"
 
       click_action {
         search_text  = "Login"
@@ -202,7 +202,7 @@ Required:
 
 - `description` (String) Space for a description of what this action does.
 - `sequence` (Number) This defines the order that actions will be taken, from number lowest first to highest number last.
-- `type` (String) The type of action to perform. Options are: CLICK, DOUBLE_CLICK, RIGHT_CLICK, TEXT_INPUT, PASSWORD_INPUT, CHANGE_WINDOW_BY_ORDER, CHANGE_WINDOW_BY_TITLE, NAVIGATE_URL, WAIT, REFRESH_PAGE, CLOSE_WINDOW, CHANGE_IFRAME_BY_ORDER, CHANGE_IFRAME_BY_XPATH, SCROLL_TO_ELEMENT, TAKE_SCREENSHOT or SAVE_DOM.
+- `type` (String) The type of action to perform. Options are: CLICK, DOUBLE_CLICK, RIGHT_CLICK, TEXT_INPUT, PASSWORD_INPUT, CHANGE_WINDOW_BY_ORDER, CHANGE_WINDOW_BY_TITLE, NAVIGATE_URL, WAIT, REFRESH_PAGE, CLOSE_WINDOW, CHANGE_IFRAME_BY_ORDER, CHANGE_IFRAME_BY_XPATH, SCROLL_TO_ELEMENT, TAKE_SCREENSHOT, SAVE_DOM or SELECT_OPTION.
 
 Optional:
 
@@ -211,9 +211,10 @@ Optional:
 - `iframe_id` (Number) The order number of the iframe to set focus to for the CHANGE_IFRAME_BY_ORDER action type. Set to 0 if you need to move focus back to the main page.
 - `iframe_xpath` (String) The xpath of the iframe to set focus to for the CHANGE_IFRAME_BY_XPATH action type.
 - `navigate_url` (String) The URL to navigate to for the NAVIGATE_URL action type.
-- `password_input_action` (Block Set, Max: 1) The additional details needed for a PASSWORD_INPUT action type. (see [below for nested schema](#nestedblock--step--action--password_input_action))
+- `password_input` (Block Set, Max: 1) The additional details needed for a PASSWORD_INPUT action type. (see [below for nested schema](#nestedblock--step--action--password_input))
 - `scroll_to_element` (Block Set, Max: 1) The additional details needed for the SCROLL_TO_ELEMENT action type. (see [below for nested schema](#nestedblock--step--action--scroll_to_element))
-- `text_input_action` (Block Set, Max: 1) The additional details needed for a TEXT_INPUT action type. (see [below for nested schema](#nestedblock--step--action--text_input_action))
+- `select_option` (Block Set, Max: 1) Additional details needed for SELECT_OPTION action type, used to choose a value from a select element. (see [below for nested schema](#nestedblock--step--action--select_option))
+- `text_input` (Block Set, Max: 1) The additional details needed for a TEXT_INPUT action type. (see [below for nested schema](#nestedblock--step--action--text_input))
 - `wait_time` (Number) The number of milliseconds to wait for the WAIT action type.
 - `window_id` (Number) The opening order number of the window to change focus to for CHANGE_WINDOW_BY_ORDER action types.
 - `window_title` (String) The title of the window to change focus to for CHANGE_WINDOW_BY_TITLE action types.
@@ -228,8 +229,8 @@ Optional:
 - `xpath` (String) The xpath of the element to click on. If multiple matches, the first will be used. Can not be used with search_text.
 
 
-<a id="nestedblock--step--action--password_input_action"></a>
-### Nested Schema for `step.action.password_input_action`
+<a id="nestedblock--step--action--password_input"></a>
+### Nested Schema for `step.action.password_input`
 
 Required:
 
@@ -252,8 +253,20 @@ Optional:
 - `xpath` (String) The xpath of the element to scroll to. If multiple matches, the first will be used. Can not be used with search_text.
 
 
-<a id="nestedblock--step--action--text_input_action"></a>
-### Nested Schema for `step.action.text_input_action`
+<a id="nestedblock--step--action--select_option"></a>
+### Nested Schema for `step.action.select_option`
+
+Optional:
+
+- `element_id` (String) The id of the select element to select a value from. Not to be used when xpath is set.
+- `option_index` (Number) Choose the option to select by the order it is shown in the list, starting from 0.
+- `option_name` (String) Choose the option to select by its name shown in the list.
+- `option_value` (String) Choose the option to select by its form value.
+- `xpath` (String) The xpath of the select element to select a value from. Not to be used when element_id is set.
+
+
+<a id="nestedblock--step--action--text_input"></a>
+### Nested Schema for `step.action.text_input`
 
 Required:
 

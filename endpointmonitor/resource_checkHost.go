@@ -22,19 +22,14 @@ func checkHost() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"name": {
+			"hostname": {
 				Type:        schema.TypeString,
-				Description: "A friendly name to describe the host. This is what the host will be referred to as on all screens and alerts.",
+				Description: "The hostname of the host. Must match what the host believes its own hostname is.",
 				Required:    true,
 			},
 			"description": {
 				Type:        schema.TypeString,
 				Description: "A place to provide more detail about the host if required.",
-				Required:    true,
-			},
-			"hostname": {
-				Type:        schema.TypeString,
-				Description: "The hostname of the host. Must match what the host believes its own hostname is.",
 				Required:    true,
 			},
 			"enabled": {
@@ -61,7 +56,7 @@ func checkHost() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }
@@ -167,9 +162,8 @@ func mapCheckHost(d *schema.ResourceData) CheckHost {
 
 	return CheckHost{
 		Id:                  checkId,
-		Name:                d.Get("name").(string),
-		Description:         d.Get("description").(string),
 		Hostname:            d.Get("hostname").(string),
+		Description:         d.Get("description").(string),
 		Type:                &hostType,
 		Enabled:             d.Get("enabled").(bool),
 		MaxWebJourneyChecks: d.Get("max_checks").(int),
@@ -179,9 +173,8 @@ func mapCheckHost(d *schema.ResourceData) CheckHost {
 
 func mapCheckHostSchema(checkHost CheckHost, d *schema.ResourceData) {
 	d.SetId(strconv.Itoa(checkHost.Id))
-	d.Set("name", checkHost.Name)
-	d.Set("description", checkHost.Description)
 	d.Set("hostname", checkHost.Hostname)
+	d.Set("description", checkHost.Description)
 	d.Set("type", checkHost.Type)
 	d.Set("enabled", checkHost.Enabled)
 	d.Set("max_checks", checkHost.MaxWebJourneyChecks)
