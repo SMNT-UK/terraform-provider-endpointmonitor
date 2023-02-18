@@ -4,8 +4,8 @@
 # Additionally uses the endpointmonitor_web_journey_common_step 
 # data source to apply a common journey step.
 
-data "endpointmonitor_check_host" "controller" {
-  search = "controller"
+data "endpointmonitor_host_group" "agent_group" {
+  search = "agent"
 }
 
 data "endpointmonitor_check_group" "websites" {
@@ -125,6 +125,6 @@ resource "endpointmonitor_web_journey_check" "example" {
     }
   }
 
-  check_host_id  = data.endpointmonitor_check_host.controller.id
+  host_group_id  = data.endpointmonitor_host_group.agent_group.id
   check_group_id = endpointmonitor_check_group.websites.id
 }

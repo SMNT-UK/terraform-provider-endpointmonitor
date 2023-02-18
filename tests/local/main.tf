@@ -40,9 +40,9 @@ resource "endpointmonitor_app_group" "test" {
 }
 
 resource "endpointmonitor_check_group" "test" {
-  name            = "Terraform Check Group 2"
-  description     = "Terraform description of a check group"
-  app_group_id    = endpointmonitor_app_group.test.id
+  name         = "Terraform Check Group 2"
+  description  = "Terraform description of a check group"
+  app_group_id = endpointmonitor_app_group.test.id
 }
 
 resource "endpointmonitor_url_check" "test" {
@@ -283,8 +283,8 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
 }
 
 resource "endpointmonitor_host_group" "test" {
-  name = "Terraform Test Host Group"
-  description = "Testing Terraform host group resource."
-  enabled = true
+  name           = "Terraform Test Host Group"
+  description    = "Testing Terraform host group resource."
+  enabled        = true
   check_host_ids = data.endpointmonitor_check_hosts.test.ids
 }
