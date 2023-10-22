@@ -25,6 +25,11 @@ type Check struct {
 	CheckGroup          CheckGroup `json:"checkGroup"`
 }
 
+type CheckString struct {
+	String     string `json:"string"`
+	Comparator string `json:"comparator"`
+}
+
 type URLCheck struct {
 	Id                   int             `json:"id"`
 	Name                 string          `json:"name"`
@@ -45,15 +50,30 @@ type URLCheck struct {
 	RequestBody          string          `json:"requestBody"`
 	RequestHeaders       []RequestHeader `json:"requestHeaders"`
 	CheckStrings         []CheckString   `json:"checkStrings"`
-	CheckHost            CheckHost       `json:"checkHost"`
-	HostGroup            HostGroup       `json:"hostGroup"`
+	CheckHost            *CheckHost      `json:"checkHost"`
+	HostGroup            *HostGroup      `json:"hostGroup"`
 	CheckGroup           CheckGroup      `json:"checkGroup"`
 	ProxyHost            *ProxyHost      `json:"proxyHost"`
 }
 
-type CheckString struct {
-	String     string `json:"string"`
-	Comparator string `json:"comparator"`
+type CertificateCheck struct {
+	Id                   int        `json:"id"`
+	Name                 string     `json:"name"`
+	Description          string     `json:"description"`
+	Enabled              bool       `json:"enabled"`
+	CheckType            string     `json:"checkType"`
+	CheckFrequency       int        `json:"checkFrequency"`
+	MaintenanceOverride  bool       `json:"maintenanceOverride"`
+	TriggerCount         int        `json:"triggerCount"`
+	ResultRetentionDays  int        `json:"resultRetentionDays"`
+	URL                  string     `json:"url"`
+	WarningDaysRemaining int        `json:"warningDaysRemaining"`
+	AlertDaysRemaining   int        `json:"alertDaysRemaining"`
+	CheckDatesOnly       bool       `json:"checkDatesOnly"`
+	CheckFullChain       bool       `json:"checkFullChain"`
+	CheckHost            *CheckHost `json:"checkHost"`
+	HostGroup            *HostGroup `json:"hostGroup"`
+	CheckGroup           CheckGroup `json:"checkGroup"`
 }
 
 type SocketCheck struct {
@@ -68,8 +88,8 @@ type SocketCheck struct {
 	Port                int        `json:"port"`
 	TriggerCount        int        `json:"triggerCount"`
 	ResultRetentionDays int        `json:"resultRetentionDays"`
-	CheckHost           CheckHost  `json:"checkHost"`
-	HostGroup           HostGroup  `json:"hostGroup"`
+	CheckHost           *CheckHost `json:"checkHost"`
+	HostGroup           *HostGroup `json:"hostGroup"`
 	CheckGroup          CheckGroup `json:"checkGroup"`
 }
 
@@ -85,8 +105,8 @@ type DNSCheck struct {
 	ExpectedAddresses   []string   `json:"expectedAddresses"`
 	TriggerCount        int        `json:"triggerCount"`
 	ResultRetentionDays int        `json:"resultRetentionDays"`
-	CheckHost           CheckHost  `json:"checkHost"`
-	HostGroup           HostGroup  `json:"hostGroup"`
+	CheckHost           *CheckHost `json:"checkHost"`
+	HostGroup           *HostGroup `json:"hostGroup"`
 	CheckGroup          CheckGroup `json:"checkGroup"`
 }
 
@@ -103,8 +123,8 @@ type PingCheck struct {
 	Timeout             int        `json:"timeout"`
 	TriggerCount        int        `json:"triggerCount"`
 	ResultRetentionDays int        `json:"resultRetentionDays"`
-	CheckHost           CheckHost  `json:"checkHost"`
-	HostGroup           HostGroup  `json:"hostGroup"`
+	CheckHost           *CheckHost `json:"checkHost"`
+	HostGroup           *HostGroup `json:"hostGroup"`
 	CheckGroup          CheckGroup `json:"checkGroup"`
 }
 
@@ -123,8 +143,8 @@ type WebJourneyCheck struct {
 	WindowWidth         int              `json:"windowWidth"`
 	MonitorDomains      []MonitorDomain  `json:"monitorDomains"`
 	Steps               []WebJourneyStep `json:"steps"`
-	CheckHost           CheckHost        `json:"checkHost"`
-	HostGroup           HostGroup        `json:"hostGroup"`
+	CheckHost           *CheckHost       `json:"checkHost"`
+	HostGroup           *HostGroup       `json:"hostGroup"`
 	CheckGroup          CheckGroup       `json:"checkGroup"`
 	ProxyHost           *ProxyHost       `json:"proxyHost"`
 }
@@ -408,6 +428,42 @@ func (c *Client) GetUrlCheck(id string) (*URLCheck, error) {
 	return &urlCheck, nil
 }
 
+func (c *Client) GetCertificateCheck(id string) (*CertificateCheck, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/%s", c.HostURL, id), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	check := Check{}
+	certificateCheck := CertificateCheck{}
+
+	if body != nil {
+		err = json.Unmarshal(body, &check)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, nil
+	}
+
+	if check.CheckType != "TLS_CERTIFICATE" {
+		err = errors.New("Existing check is not a TLS_CERTIFICATE Check.")
+		return nil, err
+	}
+
+	err = json.Unmarshal(body, &certificateCheck)
+	if err != nil {
+		return nil, err
+	}
+
+	return &certificateCheck, nil
+}
+
 func (c *Client) GetSocketCheck(id string) (*SocketCheck, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/%s", c.HostURL, id), nil)
 	if err != nil {
@@ -603,6 +659,32 @@ func (c *Client) CreateUrlCheck(check URLCheck) (*URLCheck, error) {
 	return &newCheck, nil
 }
 
+func (c *Client) CreateCertificateCheck(check CertificateCheck) (*CertificateCheck, error) {
+	rb, err := json.Marshal(check)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/checks/add/certificate", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	newCheck := CertificateCheck{}
+
+	err = json.Unmarshal(body, &newCheck)
+	if err != nil {
+		return nil, err
+	}
+
+	return &newCheck, nil
+}
+
 func (c *Client) CreateSocketCheck(check SocketCheck) (*SocketCheck, error) {
 	rb, err := json.Marshal(check)
 	if err != nil {
@@ -754,6 +836,31 @@ func (c *Client) UpdateUrlCheck(check URLCheck) (*URLCheck, error) {
 	}
 
 	updatedCheck := URLCheck{}
+	err = json.Unmarshal(body, &updatedCheck)
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedCheck, nil
+}
+
+func (c *Client) UpdateCertificateCheck(check CertificateCheck) (*CertificateCheck, error) {
+	rb, err := json.Marshal(check)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/checks/update/certificate", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedCheck := CertificateCheck{}
 	err = json.Unmarshal(body, &updatedCheck)
 	if err != nil {
 		return nil, err

@@ -49,7 +49,7 @@ func dnsCheck() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "If set true then notifications and alerts will be suppressed for the check.",
 				Optional:    true,
-				Default:     true,
+				Default:     false,
 			},
 			"hostname": {
 				Type:         schema.TypeString,
@@ -85,9 +85,9 @@ func dnsCheck() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validatePositiveInt(),
 			},
-			"host_group_id": {
+			"check_host_group_id": {
 				Type:         schema.TypeInt,
-				Description:  "The id of a Check Group Group to run the check on.",
+				Description:  "The id of a Check Host Group to run the check on.",
 				Optional:     true,
 				ValidateFunc: validatePositiveInt(),
 			},
@@ -203,7 +203,7 @@ func mapDNSCheck(d *schema.ResourceData) DNSCheck {
 		addresses[index] = address.(string)
 	}
 
-	return DNSCheck{
+	check := DNSCheck{
 		Id:                  checkId,
 		Name:                d.Get("name").(string),
 		Description:         d.Get("description").(string),
@@ -215,16 +215,24 @@ func mapDNSCheck(d *schema.ResourceData) DNSCheck {
 		ExpectedAddresses:   addresses,
 		TriggerCount:        d.Get("trigger_count").(int),
 		ResultRetentionDays: d.Get("result_retention").(int),
-		CheckHost: CheckHost{
-			Id: d.Get("check_host_id").(int),
-		},
-		HostGroup: HostGroup{
-			Id: d.Get("host_group_id").(int),
-		},
 		CheckGroup: CheckGroup{
 			Id: d.Get("check_group_id").(int),
 		},
 	}
+
+	if d.Get("check_host_id") != nil {
+		check.CheckHost = &CheckHost{
+			Id: d.Get("check_host_id").(int),
+		}
+	}
+
+	if d.Get("check_host_group_id") != nil {
+		check.HostGroup = &HostGroup{
+			Id: d.Get("check_host_group_id").(int),
+		}
+	}
+
+	return check
 }
 
 func mapDNSCheckSchema(check DNSCheck, d *schema.ResourceData) {
@@ -238,7 +246,13 @@ func mapDNSCheckSchema(check DNSCheck, d *schema.ResourceData) {
 	d.Set("expected_addresses", check.ExpectedAddresses)
 	d.Set("trigger_count", check.TriggerCount)
 	d.Set("result_retention", check.ResultRetentionDays)
-	d.Set("check_host_id", check.CheckHost.Id)
-	d.Set("host_group_id", check.HostGroup.Id)
 	d.Set("check_group_id", check.CheckGroup.Id)
+
+	if check.CheckHost != nil {
+		d.Set("check_host_id", check.CheckHost.Id)
+	}
+
+	if check.HostGroup != nil {
+		d.Set("check_host_group_id", check.HostGroup.Id)
+	}
 }

@@ -50,7 +50,7 @@ func urlCheck() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "If set true then notifications and alerts will be suppressed for the check.",
 				Optional:    true,
-				Default:     true,
+				Default:     false,
 			},
 			"url": {
 				Type:         schema.TypeString,
@@ -154,7 +154,13 @@ func urlCheck() *schema.Resource {
 			"check_host_id": {
 				Type:         schema.TypeInt,
 				Description:  "The id of the Check Host to run the check on.",
-				Required:     true,
+				Optional:     true,
+				ValidateFunc: validatePositiveInt(),
+			},
+			"check_host_group_id": {
+				Type:         schema.TypeInt,
+				Description:  "The id of the Check Host Group to run the check on.",
+				Optional:     true,
 				ValidateFunc: validatePositiveInt(),
 			},
 			"check_group_id": {
@@ -310,9 +316,6 @@ func mapUrlCheck(d *schema.ResourceData) URLCheck {
 		AllowRedirects:       d.Get("allow_redirects").(bool),
 		RequestBody:          d.Get("request_body").(string),
 		RequestHeaders:       requestHeaders,
-		CheckHost: CheckHost{
-			Id: d.Get("check_host_id").(int),
-		},
 		CheckGroup: CheckGroup{
 			Id: d.Get("check_group_id").(int),
 		},
@@ -321,6 +324,18 @@ func mapUrlCheck(d *schema.ResourceData) URLCheck {
 	if d.Get("proxy_host_id").(int) != 0 {
 		check.ProxyHost = &ProxyHost{
 			Id: d.Get("proxy_host_id").(int),
+		}
+	}
+
+	if d.Get("check_host_id") != nil {
+		check.CheckHost = &CheckHost{
+			Id: d.Get("check_host_id").(int),
+		}
+	}
+
+	if d.Get("check_host_group_id") != nil {
+		check.HostGroup = &HostGroup{
+			Id: d.Get("check_host_group_id").(int),
 		}
 	}
 
@@ -345,12 +360,19 @@ func mapUrlCheckSchema(check URLCheck, d *schema.ResourceData) {
 	d.Set("timeout", check.Timeout)
 	d.Set("allow_redirects", check.AllowRedirects)
 	d.Set("request_body", check.RequestBody)
-	d.Set("check_host_id", check.CheckHost.Id)
 	d.Set("check_group_id", check.CheckGroup.Id)
 	d.Set("request_header", check.RequestHeaders)
 
 	if check.ProxyHost != nil {
 		d.Set("proxy_host_id", check.ProxyHost.Id)
+	}
+
+	if check.CheckHost != nil {
+		d.Set("check_host_id", check.CheckHost.Id)
+	}
+
+	if check.HostGroup != nil {
+		d.Set("check_host_group_id", check.HostGroup.Id)
 	}
 }
 

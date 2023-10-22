@@ -23,7 +23,6 @@ data "endpointmonitor_app_group" "example" {
 resource "endpointmonitor_check_group" "example" {
   name            = "Main Company Website"
   description     = "Contains checks for the main company website."
-  check_frequency = 60
   app_group_id    = endpointmonitor_app_group.example.id
 }
 ```
@@ -34,7 +33,6 @@ resource "endpointmonitor_check_group" "example" {
 ### Required
 
 - `app_group_id` (Number) The id of the App Group this belongs to.
-- `check_frequency` (Number) The frequency in seconds that checks within this group should be run.
 - `description` (String) A space to provide a longer description of this group.
 - `name` (String) A meaningful name of what this group contains. This will be used in alerts and notifications.
 

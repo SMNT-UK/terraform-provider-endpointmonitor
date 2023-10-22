@@ -28,6 +28,7 @@ data "endpointmonitor_check_group" "websites" {
 resource "endpointmonitor_url_check" "example" {
   name                   = "Home Page Check"
   description            = "Check home page loads as expected"
+  check_frequency        = 60
   url                    = "https://www.mycompany.com/"
   trigger_count          = 2
   request_method         = "GET"
@@ -55,7 +56,6 @@ resource "endpointmonitor_url_check" "example" {
 - `alert_response_time` (Number) The alert response time threshold in milliseconds.
 - `allow_redirects` (Boolean) If true, the check will follow redirects. If false the initial response will be evaluated for the check.
 - `check_group_id` (Number) The id of the Check Group the check belongs to. This also determines check frequency.
-- `check_host_id` (Number) The id of the Check Host to run the check on.
 - `expected_response_code` (Number) The expected successful response code. Any code other than this will be considered a failure.
 - `name` (String) A name to describe in the check, used throughout EndPoint Monitor to describe this check, including in notifications.
 - `request_method` (String) The HTTP verb used to send the request
@@ -66,6 +66,9 @@ resource "endpointmonitor_url_check" "example" {
 
 ### Optional
 
+- `check_frequency` (Number) The frequency the check will be run in seconds.
+- `check_host_group_id` (Number) The id of the Check Host Group to run the check on.
+- `check_host_id` (Number) The id of the Check Host to run the check on.
 - `description` (String) A space to provide a longer description of the check if needed. Will default to the name if not set.
 - `enabled` (Boolean) Allows the enabling/disabling of the check from executing.
 - `maintenance_override` (Boolean) If set true then notifications and alerts will be suppressed for the check.

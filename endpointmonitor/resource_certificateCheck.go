@@ -9,13 +9,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-func pingCheck() *schema.Resource {
+func certificateCheck() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Create and manage ping checks to check a hostname or address is online.",
-		CreateContext: resourcePingCheckCreate,
-		ReadContext:   resourcePingCheckRead,
-		UpdateContext: resourcePingCheckUpdate,
-		DeleteContext: resourcePingCheckDelete,
+		Description:   "Create and manage TLS certificate checks that test a given URL for an expected response.",
+		CreateContext: resourceCertificateCheckCreate,
+		ReadContext:   resourceCertificateCheckRead,
+		UpdateContext: resourceCertificateCheckUpdate,
+		DeleteContext: resourceCertificateCheckDelete,
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Type:     schema.TypeString,
@@ -29,8 +29,8 @@ func pingCheck() *schema.Resource {
 			},
 			"description": {
 				Type:        schema.TypeString,
-				Optional:    true,
 				Description: "A space to provide a longer description of the check if needed. Will default to the name if not set.",
+				Optional:    true,
 			},
 			"enabled": {
 				Type:        schema.TypeBool,
@@ -51,23 +51,11 @@ func pingCheck() *schema.Resource {
 				Optional:    true,
 				Default:     false,
 			},
-			"hostname": {
+			"url": {
 				Type:         schema.TypeString,
-				Description:  "The hostname to ping.",
+				Description:  "The URL to check the certificate for.",
 				Required:     true,
-				ValidateFunc: validation.StringIsNotEmpty,
-			},
-			"warning_response_time": {
-				Type:         schema.TypeInt,
-				Description:  "The warning response time threshold in milliseconds.",
-				Required:     true,
-				ValidateFunc: validatePositiveInt(),
-			},
-			"timeout_time": {
-				Type:         schema.TypeInt,
-				Description:  "The number of milliseconds to wait for a response before giving up.",
-				Required:     true,
-				ValidateFunc: validatePositiveInt(),
+				ValidateFunc: validateUrl(),
 			},
 			"trigger_count": {
 				Type:         schema.TypeInt,
@@ -82,6 +70,30 @@ func pingCheck() *schema.Resource {
 				Default:      366,
 				ValidateFunc: validatePositiveInt(),
 			},
+			"warning_days_remaining": {
+				Type:         schema.TypeInt,
+				Description:  "The maximum number of remaining days on a certificate before an warning is triggered.",
+				Required:     true,
+				ValidateFunc: validatePositiveInt(),
+			},
+			"alert_days_remaining": {
+				Type:         schema.TypeInt,
+				Description:  "The maximum number of remaining days on a certificate before a failure is triggered.",
+				Required:     true,
+				ValidateFunc: validatePositiveInt(),
+			},
+			"check_date_only": {
+				Type:        schema.TypeBool,
+				Description: "If set to true, then only certificate validity period will be checked and nothing else.",
+				Optional:    true,
+				Default:     false,
+			},
+			"check_full_chain": {
+				Type:        schema.TypeBool,
+				Description: "If set to false, only the initially returned certificate from the given URL will be checked, and not the full certificate chain.",
+				Optional:    true,
+				Default:     true,
+			},
 			"check_host_id": {
 				Type:         schema.TypeInt,
 				Description:  "The id of the Check Host to run the check on.",
@@ -90,7 +102,7 @@ func pingCheck() *schema.Resource {
 			},
 			"check_host_group_id": {
 				Type:         schema.TypeInt,
-				Description:  "The id of a Check Host Group to run the check on.",
+				Description:  "The id of the Check Host Group to run the check on.",
 				Optional:     true,
 				ValidateFunc: validatePositiveInt(),
 			},
@@ -107,7 +119,7 @@ func pingCheck() *schema.Resource {
 	}
 }
 
-func resourcePingCheckRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceCertificateCheckRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*Client)
 
 	// Warning or errors can be collected in a slice type
@@ -115,7 +127,7 @@ func resourcePingCheckRead(ctx context.Context, d *schema.ResourceData, m interf
 
 	checkId := d.Id()
 
-	check, err := c.GetPingCheck(checkId)
+	check, err := c.GetCertificateCheck(checkId)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -125,32 +137,32 @@ func resourcePingCheckRead(ctx context.Context, d *schema.ResourceData, m interf
 		return nil
 	}
 
-	mapPingCheckSchema(*check, d)
+	mapCertificateCheckSchema(*check, d)
 
 	return diags
 }
 
-func resourcePingCheckCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceCertificateCheckCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*Client)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	check := mapPingCheck(d)
+	check := mapCertificateCheck(d)
 
-	o, err := c.CreatePingCheck(check)
+	o, err := c.CreateCertificateCheck(check)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	d.SetId(strconv.Itoa(int(o.Id)))
 
-	resourcePingCheckRead(ctx, d, m)
+	resourceCertificateCheckRead(ctx, d, m)
 
 	return diags
 }
 
-func resourcePingCheckUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceCertificateCheckUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*Client)
 
 	_, err := strconv.Atoi(d.Id())
@@ -159,18 +171,18 @@ func resourcePingCheckUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	if d.HasChangesExcept() {
-		check := mapPingCheck(d)
+		check := mapCertificateCheck(d)
 
-		_, err := c.UpdatePingCheck(check)
+		_, err := c.UpdateCertificateCheck(check)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 	}
 
-	return resourcePingCheckRead(ctx, d, m)
+	return resourceCertificateCheckRead(ctx, d, m)
 }
 
-func resourcePingCheckDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceCertificateCheckDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*Client)
 
 	// Warning or errors can be collected in a slice type
@@ -193,25 +205,27 @@ func resourcePingCheckDelete(ctx context.Context, d *schema.ResourceData, m inte
 	return diags
 }
 
-func mapPingCheck(d *schema.ResourceData) PingCheck {
+func mapCertificateCheck(d *schema.ResourceData) CertificateCheck {
 	checkId, err := strconv.Atoi(d.Id())
 	if err != nil {
 		checkId = 0
 	}
 
-	check := PingCheck{
-		Id:                  checkId,
-		Name:                d.Get("name").(string),
-		Description:         d.Get("description").(string),
-		Enabled:             d.Get("enabled").(bool),
-		CheckFrequency:      d.Get("check_frequency").(int),
-		CheckType:           "PING",
-		MaintenanceOverride: d.Get("maintenance_override").(bool),
-		Hostname:            d.Get("hostname").(string),
-		WarningRepsonseTime: d.Get("warning_response_time").(int),
-		Timeout:             d.Get("timeout_time").(int),
-		TriggerCount:        d.Get("trigger_count").(int),
-		ResultRetentionDays: d.Get("result_retention").(int),
+	check := CertificateCheck{
+		Id:                   checkId,
+		Name:                 d.Get("name").(string),
+		Description:          d.Get("description").(string),
+		Enabled:              d.Get("enabled").(bool),
+		CheckFrequency:       d.Get("check_frequency").(int),
+		CheckType:            "TLS_CERTIFICATE",
+		MaintenanceOverride:  d.Get("maintenance_override").(bool),
+		URL:                  d.Get("url").(string),
+		TriggerCount:         d.Get("trigger_count").(int),
+		ResultRetentionDays:  d.Get("result_retention").(int),
+		WarningDaysRemaining: d.Get("warning_days_remaining").(int),
+		AlertDaysRemaining:   d.Get("alert_days_remaining").(int),
+		CheckDatesOnly:       d.Get("check_date_only").(bool),
+		CheckFullChain:       d.Get("check_full_chain").(bool),
 		CheckGroup: CheckGroup{
 			Id: d.Get("check_group_id").(int),
 		},
@@ -232,18 +246,20 @@ func mapPingCheck(d *schema.ResourceData) PingCheck {
 	return check
 }
 
-func mapPingCheckSchema(check PingCheck, d *schema.ResourceData) {
+func mapCertificateCheckSchema(check CertificateCheck, d *schema.ResourceData) {
 	d.SetId(strconv.Itoa(check.Id))
 	d.Set("name", check.Name)
 	d.Set("description", check.Description)
 	d.Set("enabled", check.Enabled)
 	d.Set("check_frequency", check.CheckFrequency)
 	d.Set("maintenance_override", check.MaintenanceOverride)
-	d.Set("hostname", check.Hostname)
-	d.Set("warning_response_time", check.WarningRepsonseTime)
-	d.Set("timeout_time", check.Timeout)
 	d.Set("trigger_count", check.TriggerCount)
 	d.Set("result_retention", check.ResultRetentionDays)
+	d.Set("url", check.URL)
+	d.Set("warning_days_remaining", check.WarningDaysRemaining)
+	d.Set("alert_days_remaining", check.AlertDaysRemaining)
+	d.Set("check_date_only", check.CheckDatesOnly)
+	d.Set("check_full_chain", check.CheckFullChain)
 	d.Set("check_group_id", check.CheckGroup.Id)
 
 	if check.CheckHost != nil {

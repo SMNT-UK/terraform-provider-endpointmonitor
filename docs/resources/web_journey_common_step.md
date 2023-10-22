@@ -56,7 +56,7 @@ resource "endpointmonitor_web_journey_common_step" "example" {
     always_required = false
     type            = "CLICK"
 
-    click_action {
+    click {
       xpath = "//*[@class='aria-close']"
     }
   }
@@ -67,7 +67,7 @@ resource "endpointmonitor_web_journey_common_step" "example" {
     always_required = true
     type            = "CLICK"
 
-    click_action {
+    click {
       search_text  = "Accept All"
       element_type = "button"
     }
@@ -109,19 +109,19 @@ Required:
 Optional:
 
 - `always_required` (Boolean) If true the action given must be able to be completed against the current page, and if it can't the check will be marked as failed. If false, and the action can't complete, for example because the element is missing, the step will continue onto the next action regardless.
-- `click_action` (Block Set, Max: 1) The additional details needed for a CLICK, DOUBLE_CLICK or RIGHT_CLICK action type. (see [below for nested schema](#nestedblock--action--click_action))
+- `click` (Block Set, Max: 1) The additional details needed for a CLICK, DOUBLE_CLICK or RIGHT_CLICK action type. (see [below for nested schema](#nestedblock--action--click))
 - `iframe_id` (Number) The order number of the iframe to set focus to for the CHANGE_IFRAME_BY_ORDER action type. Set to 0 if you need to move focus back to the main page.
 - `iframe_xpath` (String) The xpath of the iframe to set focus to for the CHANGE_IFRAME_BY_XPATH action type.
 - `navigate_url` (String) The URL to navigate to for the NAVIGATE_URL action type.
-- `password_input_action` (Block Set, Max: 1) The additional details needed for a PASSWORD_INPUT action type. (see [below for nested schema](#nestedblock--action--password_input_action))
+- `password_input` (Block Set, Max: 1) The additional details needed for a PASSWORD_INPUT action type. (see [below for nested schema](#nestedblock--action--password_input))
 - `scroll_to_element` (Block Set, Max: 1) The additional details needed for the SCROLL_TO_ELEMENT action type. (see [below for nested schema](#nestedblock--action--scroll_to_element))
-- `text_input_action` (Block Set, Max: 1) The additional details needed for a TEXT_INPUT action type. (see [below for nested schema](#nestedblock--action--text_input_action))
+- `text_input` (Block Set, Max: 1) The additional details needed for a TEXT_INPUT action type. (see [below for nested schema](#nestedblock--action--text_input))
 - `wait_time` (Number) The number of milliseconds to wait for the WAIT action type.
 - `window_id` (Number) The opening order number of the window to change focus to for CHANGE_WINDOW_BY_ORDER action types.
 - `window_title` (String) The title of the window to change focus to for CHANGE_WINDOW_BY_TITLE action types.
 
-<a id="nestedblock--action--click_action"></a>
-### Nested Schema for `action.click_action`
+<a id="nestedblock--action--click"></a>
+### Nested Schema for `action.click`
 
 Optional:
 
@@ -130,8 +130,8 @@ Optional:
 - `xpath` (String) The xpath of the element to click on. If multiple matches, the first will be used. Can not be used with search_text.
 
 
-<a id="nestedblock--action--password_input_action"></a>
-### Nested Schema for `action.password_input_action`
+<a id="nestedblock--action--password_input"></a>
+### Nested Schema for `action.password_input`
 
 Required:
 
@@ -154,8 +154,8 @@ Optional:
 - `xpath` (String) The xpath of the element to scroll to. If multiple matches, the first will be used. Can not be used with search_text.
 
 
-<a id="nestedblock--action--text_input_action"></a>
-### Nested Schema for `action.text_input_action`
+<a id="nestedblock--action--text_input"></a>
+### Nested Schema for `action.text_input`
 
 Required:
 

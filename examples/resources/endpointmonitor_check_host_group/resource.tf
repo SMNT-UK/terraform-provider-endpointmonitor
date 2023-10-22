@@ -2,7 +2,7 @@ data "endpointmonitor_check_hosts" "agents" {
   search = "agents"
 }
 
-resource "endpointmonitor_host_group" "example" {
+resource "endpointmonitor_check_host_group" "example" {
   name             = "ECS Agent Cluster"
   description      = "ECS agent cluster for website checks"
   enabled          = true

@@ -19,8 +19,8 @@ Create and manage web journey checks that can be set up to navigate through a we
 # Additionally uses the endpointmonitor_web_journey_common_step 
 # data source to apply a common journey step.
 
-data "endpointmonitor_check_host" "controller" {
-  search = "controller"
+data "endpointmonitor_check_host_group" "agent_group" {
+  search = "agent"
 }
 
 data "endpointmonitor_check_group" "websites" {
@@ -32,11 +32,12 @@ data "endpointmonitor_web_journey_common_step" "initial" {
 }
 
 resource "endpointmonitor_web_journey_check" "example" {
-  name          = "Website Login"
-  description   = "Checks website login is working."
-  enabled       = true
-  start_url     = "https://www.mycompany.com/"
-  trigger_count = 2
+  name            = "Website Login"
+  description     = "Checks website login is working."
+  enabled         = true
+  check_frequency = 120
+  start_url       = "https://www.mycompany.com/"
+  trigger_count   = 2
 
   monitor_domain {
     domain              = "mycompany.com"
@@ -79,7 +80,7 @@ resource "endpointmonitor_web_journey_check" "example" {
       always_required = true
       type            = "TEXT_INPUT"
 
-      text_input_action {
+      text_input {
         element_id = "login_username"
         input_text = "my.user@mycompany.com"
       }
@@ -91,7 +92,7 @@ resource "endpointmonitor_web_journey_check" "example" {
       always_required = true
       type            = "PASSWORD_INPUT"
 
-      password_input_action {
+      password_input {
         element_id     = "login_password"
         input_password = var.login_password
       }
@@ -103,7 +104,7 @@ resource "endpointmonitor_web_journey_check" "example" {
       always_required = true
       type            = "CLICK"
 
-      click_action {
+      click {
         search_text  = "Login"
         element_type = "button"
       }
@@ -139,8 +140,8 @@ resource "endpointmonitor_web_journey_check" "example" {
     }
   }
 
-  check_host_id  = data.endpointmonitor_check_host.controller.id
-  check_group_id = endpointmonitor_check_group.websites.id
+  host_group_id  = data.endpointmonitor_check_host_group.agent_group.id
+  check_group_id = data.endpointmonitor_check_group.websites.id
 }
 ```
 
@@ -150,7 +151,6 @@ resource "endpointmonitor_web_journey_check" "example" {
 ### Required
 
 - `check_group_id` (Number) The id of the Check Group the check belongs to. This also determines check frequency.
-- `check_host_id` (Number) The id of the Check Host to run the check on.
 - `name` (String) A name to describe in the check, used throughout EndPoint Monitor to describe this check, including in notifications.
 - `start_url` (String) The URL to load start the journey at.
 - `step` (Block Set, Min: 1) (see [below for nested schema](#nestedblock--step))
@@ -158,6 +158,9 @@ resource "endpointmonitor_web_journey_check" "example" {
 
 ### Optional
 
+- `check_frequency` (Number) The frequency the check will be run in seconds.
+- `check_host_group_id` (Number) The id of the Check Host Group to run the check on.
+- `check_host_id` (Number) The id of the Check Host to run the check on.
 - `description` (String) A space to provide a longer description of the check if needed. Will default to the name if not set.
 - `enabled` (Boolean) Allows the enabling/disabling of the check from executing.
 - `maintenance_override` (Boolean) If set true then notifications and alerts will be suppressed for the check.
@@ -207,7 +210,7 @@ Required:
 Optional:
 
 - `always_required` (Boolean) If true the the action given must be able to be completed against the current page, and if it can't the check will be marked as failed. If false, and the action can't complete, for example because the element is missing, the step will continue onto the next action regardless.
-- `click_action` (Block Set, Max: 1) The additional details needed for a CLICK, DOUBLE_CLICK or RIGHT_CLICK action type. (see [below for nested schema](#nestedblock--step--action--click_action))
+- `click` (Block Set, Max: 1) The additional details needed for a CLICK, DOUBLE_CLICK or RIGHT_CLICK action type. (see [below for nested schema](#nestedblock--step--action--click))
 - `iframe_id` (Number) The order number of the iframe to set focus to for the CHANGE_IFRAME_BY_ORDER action type. Set to 0 if you need to move focus back to the main page.
 - `iframe_xpath` (String) The xpath of the iframe to set focus to for the CHANGE_IFRAME_BY_XPATH action type.
 - `navigate_url` (String) The URL to navigate to for the NAVIGATE_URL action type.
@@ -219,8 +222,8 @@ Optional:
 - `window_id` (Number) The opening order number of the window to change focus to for CHANGE_WINDOW_BY_ORDER action types.
 - `window_title` (String) The title of the window to change focus to for CHANGE_WINDOW_BY_TITLE action types.
 
-<a id="nestedblock--step--action--click_action"></a>
-### Nested Schema for `step.action.click_action`
+<a id="nestedblock--step--action--click"></a>
+### Nested Schema for `step.action.click`
 
 Optional:
 

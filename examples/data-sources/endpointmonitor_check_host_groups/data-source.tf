@@ -1,7 +1,7 @@
-# Example use of endpointmonitor_host_group to attach a 
+# Example use of endpointmonitor_check_host_group to attach a
 # check to a Check Host Group of all agents.
 
-data "endpointmonitor_host_group" "agents" {
+data "endpointmonitor_check_host_group" "agents" {
   search = "agents"
 }
 
@@ -20,6 +20,6 @@ resource "endpointmonitor_url_check" "example" {
   warning_response_time  = 3000
   timeout                = 10000
 
-  host_group_id  = data.endpointmonitor_host_group.agents.id
+  host_group_id  = data.endpointmonitor_check_host_group.agents.id[0]
   check_group_id = data.endpointmonitor_check_group.websites.id
 }

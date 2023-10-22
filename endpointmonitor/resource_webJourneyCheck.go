@@ -49,7 +49,7 @@ func webJourneyCheck() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "If set true then notifications and alerts will be suppressed for the check.",
 				Optional:    true,
-				Default:     true,
+				Default:     false,
 			},
 			"start_url": {
 				Type:         schema.TypeString,
@@ -707,7 +707,13 @@ func webJourneyCheck() *schema.Resource {
 			"check_host_id": {
 				Type:         schema.TypeInt,
 				Description:  "The id of the Check Host to run the check on.",
-				Required:     true,
+				Optional:     true,
+				ValidateFunc: validatePositiveInt(),
+			},
+			"check_host_group_id": {
+				Type:         schema.TypeInt,
+				Description:  "The id of the Check Host Group to run the check on.",
+				Optional:     true,
 				ValidateFunc: validatePositiveInt(),
 			},
 			"check_group_id": {
@@ -837,9 +843,6 @@ func mapWebJourneyCheck(d *schema.ResourceData) WebJourneyCheck {
 		WindowWidth:         d.Get("window_width").(int),
 		MonitorDomains:      mapMonitorDomains(d),
 		Steps:               mapWebJourneySteps(d),
-		CheckHost: CheckHost{
-			Id: d.Get("check_host_id").(int),
-		},
 		CheckGroup: CheckGroup{
 			Id: d.Get("check_group_id").(int),
 		},
@@ -848,6 +851,18 @@ func mapWebJourneyCheck(d *schema.ResourceData) WebJourneyCheck {
 	if d.Get("proxy_host_id").(int) != 0 {
 		check.ProxyHost = &ProxyHost{
 			Id: d.Get("proxy_host_id").(int),
+		}
+	}
+
+	if d.Get("check_host_id") != nil {
+		check.CheckHost = &CheckHost{
+			Id: d.Get("check_host_id").(int),
+		}
+	}
+
+	if d.Get("check_host_group_id") != nil {
+		check.HostGroup = &HostGroup{
+			Id: d.Get("check_host_group_id").(int),
 		}
 	}
 
@@ -1185,8 +1200,15 @@ func mapWebJourneyCheckSchema(check WebJourneyCheck, d *schema.ResourceData) {
 	d.Set("result_retention", check.ResultRetentionDays)
 	d.Set("window_height", check.WindowHeight)
 	d.Set("window_width", check.WindowWidth)
-	d.Set("check_host_id", check.CheckHost.Id)
 	d.Set("check_group_id", check.CheckGroup.Id)
+
+	if check.CheckHost != nil {
+		d.Set("check_host_id", check.CheckHost.Id)
+	}
+
+	if check.HostGroup != nil {
+		d.Set("check_host_group_id", check.HostGroup.Id)
+	}
 }
 
 func mapWebJourneyCommonStepSchema(step WebJourneyCommonStep, d *schema.ResourceData) {

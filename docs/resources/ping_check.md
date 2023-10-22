@@ -26,11 +26,12 @@ data "endpointmonitor_check_group" "network" {
 }
 
 resource "endpointmonitor_ping_check" "example" {
-  name           = "Ping Access Point 1"
-  hostname       = "ap01.internal.mycompany.com"
-  trigger_count  = 3
-  check_host_id  = data.endpointmonitor_check_host.controller.id
-  check_group_id = data.endpointmonitor_check_group.network.id
+  name            = "Ping Access Point 1"
+  hostname        = "ap01.internal.mycompany.com"
+  check_frequency = 30
+  trigger_count   = 3
+  check_host_id   = data.endpointmonitor_check_host.controller.id
+  check_group_id  = data.endpointmonitor_check_group.network.id
 
   warning_response_time = 2000
   timeout_time          = 5000
@@ -43,7 +44,6 @@ resource "endpointmonitor_ping_check" "example" {
 ### Required
 
 - `check_group_id` (Number) The id of the Check Group the check belongs to. This also determines check frequency.
-- `check_host_id` (Number) The id of the Check Host to run the check on.
 - `hostname` (String) The hostname to ping.
 - `name` (String) A name to describe in the check, used throughout EndPoint Monitor to describe this check, including in notifications.
 - `timeout_time` (Number) The number of milliseconds to wait for a response before giving up.
@@ -52,6 +52,9 @@ resource "endpointmonitor_ping_check" "example" {
 
 ### Optional
 
+- `check_frequency` (Number) The frequency the check will be run in seconds.
+- `check_host_group_id` (Number) The id of a Check Host Group to run the check on.
+- `check_host_id` (Number) The id of the Check Host to run the check on.
 - `description` (String) A space to provide a longer description of the check if needed. Will default to the name if not set.
 - `enabled` (Boolean) Allows the enabling/disabling of the check from executing.
 - `maintenance_override` (Boolean) If set true then notifications and alerts will be suppressed for the check.

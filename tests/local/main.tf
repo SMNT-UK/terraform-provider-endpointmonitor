@@ -13,7 +13,7 @@ terraform {
 }
 
 provider "endpointmonitor" {
-  url = "http://10.10.0.13:8080/api"
+  url = "http://10.10.0.15:8080/api"
   #url = "http://192.168.44.99:8080/api"
   key = "7412f79a-70a4-450c-8c10-0b5e958a726d" # This is safe for leaving in, it's just a key on a local dev instance.
 }
@@ -75,12 +75,26 @@ resource "endpointmonitor_dns_check" "test" {
   check_group_id     = endpointmonitor_check_group.test.id
 }
 
+resource "endpointmonitor_certificate_check" "test" {
+  name            = "Terraform Certificate Check"
+  description     = "Terraform Certificate Check Test"
+  trigger_count   = 2
+  check_frequency = 60
+
+  url                    = "https://epm.smnt.co.uk/"
+  warning_days_remaining = "7"
+  alert_days_remaining   = "2"
+
+  check_host_id  = endpointmonitor_check_host.test.id
+  check_group_id = endpointmonitor_check_group.test.id
+}
+
 resource "endpointmonitor_web_journey_check" "test" {
   name                 = "Terraform WebJourney Check"
   description          = "Terraform WebJourney check descrtiption"
   enabled              = false
   check_frequency      = 60
-  maintenance_override = true
+  maintenance_override = false
   start_url            = "https://koolness.co.uk/test"
   trigger_count        = 2
 
@@ -282,7 +296,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
   check_group_id = endpointmonitor_check_group.test.id
 }
 
-resource "endpointmonitor_host_group" "test" {
+resource "endpointmonitor_check_host_group" "test" {
   name           = "Terraform Test Host Group"
   description    = "Testing Terraform host group resource."
   enabled        = true
