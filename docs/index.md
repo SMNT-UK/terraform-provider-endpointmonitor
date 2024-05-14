@@ -16,7 +16,7 @@ The provider currently allows management of the following components of EndPoint
 - Check Hosts
 - Proxy Hosts
 - Scheduled Maintenance Periods
-- Check Groups and Dashboard Groups
+- Check Groups and App Groups
 
 To use the provider you will need to issue an API Key with write access from your EndPoint Monitor instance. This can be done by selecting API Keys on the main menu, and then selecting Add at the top of the page. Make sure that when you create it the Read Only option is toggled off.
 

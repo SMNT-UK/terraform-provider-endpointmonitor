@@ -1,7 +1,7 @@
-# Example use of endpointmonitor_checks data source to grab the 
+# Example use of endpointmonitor_check data source to grab the
 # id of a check for a Maintenance Period.
 
-data "endpointmonitor_checks" "example" {
+data "endpointmonitor_check" "example" {
   search = "Website Homepage"
 }
 

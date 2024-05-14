@@ -13,8 +13,8 @@ Create and manage Check Groups, the initial grouping of checks running on EndPoi
 ## Example Usage
 
 ```terraform
-# Example Check Group that uses the endpointmonitor_dashboard_group 
-# data source to get the id of the parent Dashboard Group.
+# Example Check Group that uses the endpointmonitor_dashboard_group data source 
+# to get the id of the parent Dashboard Group.
 
 data "endpointmonitor_dashboard_group" "example" {
   search = "Public Websites"

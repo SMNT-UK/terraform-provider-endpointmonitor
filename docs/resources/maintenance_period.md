@@ -42,9 +42,9 @@ resource "endpointmonitor_maintenance_period" "example" {
 
 ### Optional
 
-- `dashboard_group_ids` (List of Number) A list of ids of Dashboard Groups that are linked to this maintenance period.
 - `check_group_ids` (List of Number) A list of ids of Check Groups that are directly linked to the maintenance period.
 - `check_ids` (List of Number) A list of ids of Checks that are directly linked to the maintenance period.
+- `dashboard_group_ids` (List of Number) A list of ids of Dashboard Groups that are linked to this maintenance period.
 - `enabled` (Boolean) Enable or disable the maintenance period from applying to attached checks.
 
 ### Read-Only

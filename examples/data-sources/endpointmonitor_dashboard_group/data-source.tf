@@ -9,5 +9,5 @@ resource "endpointmonitor_check_group" "example" {
   name               = "Main Company Website"
   description        = "Contains checks for the main company website."
   check_frequency    = 60
-  dashboard_group_id = endpointmonitor_dashboard_group.example.id
+  dashboard_group_id = data.endpointmonitor_dashboard_group.example.id
 }

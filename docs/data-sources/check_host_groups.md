@@ -13,10 +13,10 @@ Search for multiple Check Host Groups. A list of ids will be returned for all ma
 ## Example Usage
 
 ```terraform
-# Example use of endpointmonitor_check_host_group to attach a
+# Example use of endpointmonitor_check_host_groups to attach a
 # check to a Check Host Group of all agents.
 
-data "endpointmonitor_check_host_group" "agents" {
+data "endpointmonitor_check_host_groups" "agents" {
   search = "agents"
 }
 
@@ -35,7 +35,7 @@ resource "endpointmonitor_url_check" "example" {
   warning_response_time  = 3000
   timeout                = 10000
 
-  host_group_id  = data.endpointmonitor_check_host_group.agents.id[0]
+  host_group_id  = data.endpointmonitor_check_host_groups.agents.id[0]
   check_group_id = data.endpointmonitor_check_group.websites.id
 }
 ```

@@ -28,5 +28,5 @@ resource "endpointmonitor_web_journey_check" "example" {
   }
 
   check_host_id  = data.endpointmonitor_check_host.controller.id
-  check_group_id = endpointmonitor_check_group.website.id
+  check_group_id = data.endpointmonitor_check_group.website.id
 }

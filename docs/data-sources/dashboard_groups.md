@@ -21,12 +21,12 @@ data "endpointmonitor_dashboard_groups" "example" {
 }
 
 resource "endpointmonitor_check_group" "example" {
-  count = length(endpointmonitor_dashboard_groups.example.ids)
+  count = length(data.endpointmonitor_dashboard_groups.example.ids)
 
   name               = "Default Group"
   description        = "Default group."
   check_frequency    = 60
-  dashboard_group_id = endpointmonitor_dashboard_groups.example.ids[count.index]
+  dashboard_group_id = data.endpointmonitor_dashboard_groups.example.ids[count.index]
 }
 ```
 
