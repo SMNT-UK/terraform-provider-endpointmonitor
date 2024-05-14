@@ -30,9 +30,9 @@ func checkGroup() *schema.Resource {
 				Description: "A space to provide a longer description of this group.",
 				Required:    true,
 			},
-			"app_group_id": {
+			"dashboard_group_id": {
 				Type:        schema.TypeInt,
-				Description: "The id of the App Group this belongs to.",
+				Description: "The id of the Dashboard Group this belongs to.",
 				Required:    true,
 			},
 		},
@@ -138,8 +138,8 @@ func mapCheckGroup(d *schema.ResourceData) CheckGroup {
 		Id:          checkGroupId,
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		AppGroup: AppGroup{
-			Id: d.Get("app_group_id").(int),
+		DashboardGroup: DashboardGroup{
+			Id: d.Get("dashboard_group_id").(int),
 		},
 	}
 }
@@ -148,5 +148,5 @@ func mapCheckGroupSchema(checkGroup CheckGroup, d *schema.ResourceData) {
 	d.SetId(strconv.Itoa(checkGroup.Id))
 	d.Set("name", checkGroup.Name)
 	d.Set("description", checkGroup.Description)
-	d.Set("app_group_id", checkGroup.AppGroup.Id)
+	d.Set("dashboard_group_id", checkGroup.DashboardGroup.Id)
 }

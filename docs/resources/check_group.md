@@ -13,17 +13,17 @@ Create and manage Check Groups, the initial grouping of checks running on EndPoi
 ## Example Usage
 
 ```terraform
-# Example Check Group that uses the endpointmonitor_app_group data source 
-# to get the id of the parent App Group.
+# Example Check Group that uses the endpointmonitor_dashboard_group 
+# data source to get the id of the parent Dashboard Group.
 
-data "endpointmonitor_app_group" "example" {
+data "endpointmonitor_dashboard_group" "example" {
   search = "Public Websites"
 }
 
 resource "endpointmonitor_check_group" "example" {
-  name            = "Main Company Website"
-  description     = "Contains checks for the main company website."
-  app_group_id    = endpointmonitor_app_group.example.id
+  name               = "Main Company Website"
+  description        = "Contains checks for the main company website."
+  dashboard_group_id = endpointmonitor_dashboard_group.example.id
 }
 ```
 
@@ -32,7 +32,7 @@ resource "endpointmonitor_check_group" "example" {
 
 ### Required
 
-- `app_group_id` (Number) The id of the App Group this belongs to.
+- `dashboard_group_id` (Number) The id of the Dashboard Group this belongs to.
 - `description` (String) A space to provide a longer description of this group.
 - `name` (String) A meaningful name of what this group contains. This will be used in alerts and notifications.
 

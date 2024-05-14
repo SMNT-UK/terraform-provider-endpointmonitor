@@ -13,20 +13,20 @@ func Provider() *schema.Provider {
 		Schema: map[string]*schema.Schema{
 			"url": {
 				Type:        schema.TypeString,
-				Description: "The API base path of your EndPoint Monitor installation. This is usually the path you would normally access EndPoint Monitor through with /api appended. This can also be passed in through the environment variable EPM_URL.",
+				Description: "The API base path of your EndPointMonitor installation. This is usually the path you would normally access EndPointMonitor through with /api appended. This can also be passed in through the environment variable EPM_URL.",
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("EPM_URL", nil),
 			},
 			"key": {
 				Type:        schema.TypeString,
-				Description: "An API key issued from your EndPoint Monitor installation under the API Keys section. Make sure the API key used has write access. This should be passed in using an environment variable with name EPM_API_KEY. Do not store this key in any configuration.",
+				Description: "An API key issued from your EndPointMonitor installation under the API Keys section. Make sure the API key used has write access. This should be passed in using an environment variable with name EPM_API_KEY. Do not store this key in any configuration.",
 				Sensitive:   true,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("EPM_API_KEY", nil),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"endpointmonitor_app_group":               appGroup(),
+			"endpointmonitor_dashboard_group":         dashboardGroup(),
 			"endpointmonitor_check_group":             checkGroup(),
 			"endpointmonitor_check_host":              checkHost(),
 			"endpointmonitor_dns_check":               dnsCheck(),
@@ -41,8 +41,8 @@ func Provider() *schema.Provider {
 			"endpointmonitor_web_journey_common_step": webJourneyCommonStep(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"endpointmonitor_app_group":                dataSourceAppGroup(),
-			"endpointmonitor_app_groups":               dataSourceAppGroups(),
+			"endpointmonitor_dashboard_group":          dataSourceDashboardGroup(),
+			"endpointmonitor_dashboard_groups":         dataSourceDashboardGroups(),
 			"endpointmonitor_check":                    dataSourceCheck(),
 			"endpointmonitor_checks":                   dataSourceChecks(),
 			"endpointmonitor_check_group":              dataSourceCheckGroup(),

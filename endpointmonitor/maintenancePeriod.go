@@ -10,15 +10,15 @@ import (
 )
 
 type MaintenancePeriod struct {
-	Id          int    `json:"id"`
-	Description string `json:"description"`
-	Enabled     bool   `json:"enabled"`
-	StartTime   string `json:"startTime"`
-	EndTime     string `json:"endTime"`
-	DayOfWeek   string `json:"dayOfWeek"`
-	Checks      []int  `json:"checks"`
-	CheckGroups []int  `json:"checkGroups"`
-	AppGroups   []int  `json:"appGroups"`
+	Id              int    `json:"id"`
+	Description     string `json:"description"`
+	Enabled         bool   `json:"enabled"`
+	StartTime       string `json:"startTime"`
+	EndTime         string `json:"endTime"`
+	DayOfWeek       string `json:"dayOfWeek"`
+	Checks          []int  `json:"checks"`
+	CheckGroups     []int  `json:"checkGroups"`
+	DashboardGroups []int  `json:"dashboardGroups"`
 }
 
 func (c *Client) SearchMaintenancePeriods(search string) (*[]MaintenancePeriod, error) {

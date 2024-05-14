@@ -64,9 +64,9 @@ func maintenancePeriod() *schema.Resource {
 					ValidateFunc: validatePositiveInt(),
 				},
 			},
-			"app_group_ids": {
+			"dashboard_group_ids": {
 				Type:        schema.TypeList,
-				Description: "A list of ids of App Groups that are linked to this maintenance period.",
+				Description: "A list of ids of Dashboard Groups that are linked to this maintenance period.",
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type:         schema.TypeInt,
@@ -186,23 +186,23 @@ func mapMaintenancePeriod(d *schema.ResourceData) MaintenancePeriod {
 		check_group_ids[index] = check_group_id.(int)
 	}
 
-	appGroups := d.Get("app_group_ids").([]interface{})
-	app_group_ids := make([]int, len(appGroups))
+	dashboardGroups := d.Get("dashboard_group_ids").([]interface{})
+	dashboard_group_ids := make([]int, len(dashboardGroups))
 
-	for index, app_group_id := range appGroups {
-		app_group_ids[index] = app_group_id.(int)
+	for index, dashboard_group_id := range dashboardGroups {
+		dashboard_group_ids[index] = dashboard_group_id.(int)
 	}
 
 	return MaintenancePeriod{
-		Id:          id,
-		Description: d.Get("description").(string),
-		Enabled:     d.Get("enabled").(bool),
-		DayOfWeek:   d.Get("day_of_week").(string),
-		StartTime:   d.Get("start_time").(string),
-		EndTime:     d.Get("end_time").(string),
-		Checks:      check_ids,
-		CheckGroups: check_group_ids,
-		AppGroups:   app_group_ids,
+		Id:              id,
+		Description:     d.Get("description").(string),
+		Enabled:         d.Get("enabled").(bool),
+		DayOfWeek:       d.Get("day_of_week").(string),
+		StartTime:       d.Get("start_time").(string),
+		EndTime:         d.Get("end_time").(string),
+		Checks:          check_ids,
+		CheckGroups:     check_group_ids,
+		DashboardGroups: dashboard_group_ids,
 	}
 }
 
@@ -215,5 +215,5 @@ func mapMaintenancePeriodSchema(maintenancePeriod MaintenancePeriod, d *schema.R
 	d.Set("end_time", maintenancePeriod.EndTime)
 	d.Set("check_ids", maintenancePeriod.Checks)
 	d.Set("check_group_ids", maintenancePeriod.CheckGroups)
-	d.Set("app_group_ids", maintenancePeriod.AppGroups)
+	d.Set("dashboard_group_ids", maintenancePeriod.DashboardGroups)
 }

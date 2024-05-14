@@ -6,11 +6,11 @@ data "endpointmonitor_proxy_host" "test" {
   search = "VLAN10"
 }
 
-data "endpointmonitor_app_groups" "test" {
+data "endpointmonitor_dashboard_groups" "test" {
   search = ""
 }
 
-data "endpointmonitor_app_group" "test" {
+data "endpointmonitor_dashboard_group" "test" {
   search = "Terraform"
 }
 

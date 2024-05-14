@@ -34,15 +34,15 @@ resource "endpointmonitor_check_host" "test" {
   send_check_files = true
 }
 
-resource "endpointmonitor_app_group" "test" {
-  name        = "Terraform App Group 2"
-  description = "Terraform Descrition of an App Group"
+resource "endpointmonitor_dashboard_group" "test" {
+  name        = "Terraform Dashboard Group 2"
+  description = "Terraform Descrition of an Dashboard Group"
 }
 
 resource "endpointmonitor_check_group" "test" {
-  name         = "Terraform Check Group 2"
-  description  = "Terraform description of a check group"
-  app_group_id = endpointmonitor_app_group.test.id
+  name               = "Terraform Check Group 2"
+  description        = "Terraform description of a check group"
+  dashboard_group_id = endpointmonitor_dashboard_group.test.id
 }
 
 resource "endpointmonitor_url_check" "test" {

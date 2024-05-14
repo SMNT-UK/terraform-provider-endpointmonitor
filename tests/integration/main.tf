@@ -15,15 +15,15 @@ provider "endpointmonitor" {
   url = "https://smnt-edin-epm.net.smnt.co.uk/api"
 }
 
-resource "endpointmonitor_app_group" "integration_tests" {
+resource "endpointmonitor_dashboard_group" "integration_tests" {
   name        = "Integration Tests"
   description = "Integration test checks. Managed by Terraform."
 }
 
 resource "endpointmonitor_check_group" "integration_tests" {
-  name            = "Integration Tests"
-  description     = "Integration test checks. Managed by Terraform."
-  app_group_id    = endpointmonitor_app_group.integration_tests.id
+  name               = "Integration Tests"
+  description        = "Integration test checks. Managed by Terraform."
+  dashboard_group_id = endpointmonitor_dashboard_group.integration_tests.id
 }
 
 resource "endpointmonitor_url_check" "integration_test" {
