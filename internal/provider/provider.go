@@ -52,10 +52,10 @@ func (p *endPointMonitorProvider) Schema(_ context.Context, _ provider.SchemaReq
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"url": schema.StringAttribute{
-				Required: true,
+				Optional: true,
 			},
 			"key": schema.StringAttribute{
-				Required:  true,
+				Optional:  true,
 				Sensitive: true,
 			},
 		},
