@@ -63,7 +63,4 @@ resource "endpointmonitor_url_check" "example" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
 - `ids` (List of Number)
-
-

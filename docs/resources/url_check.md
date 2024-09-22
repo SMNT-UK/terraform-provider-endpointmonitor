@@ -54,7 +54,7 @@ resource "endpointmonitor_url_check" "example" {
 ### Required
 
 - `alert_response_time` (Number) The alert response time threshold in milliseconds.
-- `allow_redirects` (Boolean) If true, the check will follow redirects. If false the initial response will be evaluated for the check.
+- `check_frequency` (Number) The frequency the check will be run in seconds.
 - `check_group_id` (Number) The id of the Check Group the check belongs to. This also determines check frequency.
 - `expected_response_code` (Number) The expected successful response code. Any code other than this will be considered a failure.
 - `name` (String) A name to describe in the check, used throughout EndPoint Monitor to describe this check, including in notifications.
@@ -66,7 +66,7 @@ resource "endpointmonitor_url_check" "example" {
 
 ### Optional
 
-- `check_frequency` (Number) The frequency the check will be run in seconds.
+- `allow_redirects` (Boolean) If true, the check will follow redirects. If false the initial response will be evaluated for the check.
 - `check_host_group_id` (Number) The id of the Check Host Group to run the check on.
 - `check_host_id` (Number) The id of the Check Host to run the check on.
 - `description` (String) A space to provide a longer description of the check if needed. Will default to the name if not set.
@@ -75,28 +75,35 @@ resource "endpointmonitor_url_check" "example" {
 - `proxy_host_id` (Number) The id of the Proxy Host the check should use for a HTTP proxy if needed.
 - `request_body` (String) The body to send as part of the check.
 - `request_header` (Block List) Header to send as part of the check. (see [below for nested schema](#nestedblock--request_header))
-- `response_body_checks` (Block List) A list of string checks to perform against the returned body from the URL. (see [below for nested schema](#nestedblock--response_body_checks))
+- `response_body_check` (Block List) A list of string checks to perform against the returned body from the URL. (see [below for nested schema](#nestedblock--response_body_check))
 - `result_retention` (Number) The number of days to store historic results of the check.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
 
 <a id="nestedblock--request_header"></a>
 ### Nested Schema for `request_header`
 
 Required:
 
-- `name` (String)
-- `value` (String)
+- `name` (String) The name of the header to send.
+- `value` (String) The value of the header to send.
 
 
-<a id="nestedblock--response_body_checks"></a>
-### Nested Schema for `response_body_checks`
+<a id="nestedblock--response_body_check"></a>
+### Nested Schema for `response_body_check`
 
 Required:
 
 - `comparator` (String) The comparison to use between the string given and the response body.
 - `string` (String) The string to used in this check.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# URL checks can be imported using their numeric id, which can be see in the address bar when editing a check in the web interface.
+terraform import endpointmonitor_url_check.example 123
+```

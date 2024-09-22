@@ -30,17 +30,24 @@ resource "endpointmonitor_check_host" "example" {
 ### Required
 
 - `description` (String) A place to provide more detail about the host if required.
-- `enabled` (Boolean) If disabled checks set to run against this host will be paused.
 - `hostname` (String) The hostname of the host. Must match what the host believes its own hostname is.
 - `type` (String) Must be either CONTROLLER or AGENT. CONTROLLER is used for hosts that expose the Web GUI and required database access. AGENT is used for hosts that purely just run checks.
 
 ### Optional
 
+- `enabled` (Boolean) If disabled checks set to run against this host will be paused.
 - `max_checks` (Number) The maximum number of concurrent Web Journey checks the host can run. Default is 1.
 - `send_check_files` (Boolean) For agents only. Indicates if it is to send check files such as screenshots back to the controller through the controller API. Should be enabled if there isn't a common file share between agent and controllers.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# Check Hosts can be imported using their numeric id, which can be see in the address bar when editing a Check host in the web interface.
+terraform import endpointmonitor_check_host.example 123
+```

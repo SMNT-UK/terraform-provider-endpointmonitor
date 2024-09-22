@@ -10,7 +10,7 @@ pipeline {
         stage("Build") {
             agent {
                 docker {
-                    image "golang:1.18-alpine"
+                    image "golang:1.22-alpine"
                     args "-u 0:0"
                 }
             }

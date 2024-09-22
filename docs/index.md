@@ -13,7 +13,7 @@ The EndPoint Monitor provider allows you to manage most aspects of your syntheti
 The provider currently allows management of the following components of EndPoint Monitor:
 - Checks (including web journeys)
 - Common Web Journey Steps
-- Check Hosts
+- Check Hosts and Check Host Groups
 - Proxy Hosts
 - Scheduled Maintenance Periods
 - Check Groups and App Groups

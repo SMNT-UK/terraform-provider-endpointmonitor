@@ -33,12 +33,12 @@ resource "endpointmonitor_check_host_group" "example" {
 ### Required
 
 - `check_host_ids` (List of Number) List of Check Host id's that are to be part of this Host Group.
-- `enabled` (Boolean) Enable or disable checks assigned to this host group.
 - `name` (String) A name to identify this group of hosts by. This will show in searches and alerts.
 
 ### Optional
 
 - `description` (String) Space for a longer description to define this group of hosts by. Not required.
+- `enabled` (Boolean) Enable or disable checks assigned to this host group.
 
 ### Read-Only
 

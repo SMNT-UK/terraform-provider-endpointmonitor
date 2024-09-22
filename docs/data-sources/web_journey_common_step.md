@@ -57,5 +57,3 @@ resource "endpointmonitor_web_journey_check" "example" {
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
-
-

@@ -1,0 +1,2 @@
+# Dashboard Groups can be imported using their numeric id, which can be see in the address bar when editing a Dashboard Group in the web interface.
+terraform import endpointmonitor_dashboard_group.example 123

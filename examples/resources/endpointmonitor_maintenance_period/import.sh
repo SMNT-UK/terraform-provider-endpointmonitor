@@ -1,0 +1,2 @@
+# Maintenance Periods can be imported using their numeric id, which can be see in the address bar when editing a Maintenance Period in the web interface.
+terraform import endpointmonitor_maintenance_period.example 123

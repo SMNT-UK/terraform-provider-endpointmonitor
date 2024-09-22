@@ -40,5 +40,3 @@ resource "endpointmonitor_maintenance_period" "example" {
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
-
-

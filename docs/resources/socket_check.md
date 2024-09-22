@@ -41,24 +41,32 @@ resource "endpointmonitor_socket_check" "example" {
 
 ### Required
 
+- `check_frequency` (Number) The frequency the check will be run in seconds.
 - `check_group_id` (Number) The id of the Check Group the check belongs to. This also determines check frequency.
-- `hostname` (String) The hostname to check the socket is open on.
+- `hostname` (String) The hostname to check.
 - `name` (String) A name to describe in the check, used throughout EndPoint Monitor to describe this check, including in notifications.
 - `port` (Number) The TCP port to check is listening.
 - `trigger_count` (Number) The sequential number of failures that need to occur for a check to trigger an alert or notification.
 
 ### Optional
 
-- `check_frequency` (Number) The frequency the check will be run in seconds.
 - `check_host_group_id` (Number) The id of the Check Host Group to run the check on.
 - `check_host_id` (Number) The id of the Check Host to run the check on.
 - `description` (String) A space to provide a longer description of the check if needed. Will default to the name if not set.
 - `enabled` (Boolean) Allows the enabling/disabling of the check from executing.
 - `maintenance_override` (Boolean) If set true then notifications and alerts will be suppressed for the check.
+- `proxy_host_id` (Number) The id of the Proxy Host the check should use for a HTTP proxy if needed.
 - `result_retention` (Number) The number of days to store historic results of the check.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# Socket checks can be imported using their numeric id, which can be see in the address bar when editing a check in the web interface.
+terraform import endpointmonitor_socket_check.example 123
+```

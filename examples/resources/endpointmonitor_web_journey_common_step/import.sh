@@ -1,0 +1,2 @@
+# Web Journey Common Steps can be imported using their numeric id, which can be see in the address bar when editing a Common Step in the web interface.
+terraform import endpointmonitor_web_journey_common_step.example 123

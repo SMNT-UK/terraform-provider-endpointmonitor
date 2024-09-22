@@ -37,6 +37,7 @@ resource "endpointmonitor_maintenance_period" "example" {
 
 - `day_of_week` (String) The day of week the maintenance period applies to. Set as ALL for every day of the week. Must otherwise be SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY or SATURDAY.
 - `description` (String) Space for a description of the maintenance periods purpose.
+- `enabled` (Boolean) Enable or disable the maintenance period from applying to attached checks.
 - `end_time` (String) The end of time the maintenance period in format 24HH:MM.
 - `start_time` (String) The start time of the maintenance period in format 24HH:MM.
 
@@ -45,10 +46,16 @@ resource "endpointmonitor_maintenance_period" "example" {
 - `check_group_ids` (List of Number) A list of ids of Check Groups that are directly linked to the maintenance period.
 - `check_ids` (List of Number) A list of ids of Checks that are directly linked to the maintenance period.
 - `dashboard_group_ids` (List of Number) A list of ids of Dashboard Groups that are linked to this maintenance period.
-- `enabled` (Boolean) Enable or disable the maintenance period from applying to attached checks.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# Maintenance Periods can be imported using their numeric id, which can be see in the address bar when editing a Maintenance Period in the web interface.
+terraform import endpointmonitor_maintenance_period.example 123
+```

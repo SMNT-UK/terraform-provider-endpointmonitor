@@ -29,6 +29,13 @@ resource "endpointmonitor_dashboard_group" "example" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (Number) The ID of this resource.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# Dashboard Groups can be imported using their numeric id, which can be see in the address bar when editing a Dashboard Group in the web interface.
+terraform import endpointmonitor_dashboard_group.example 123
+```

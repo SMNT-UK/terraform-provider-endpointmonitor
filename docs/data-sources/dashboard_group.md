@@ -38,5 +38,3 @@ resource "endpointmonitor_check_group" "example" {
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
-
-

@@ -13,9 +13,20 @@ terraform {
 }
 
 provider "endpointmonitor" {
-  url = "http://10.10.0.15:8080/api"
+  url = "http://localhost:8080/api"
   #url = "http://192.168.44.99:8080/api"
-  key = "7412f79a-70a4-450c-8c10-0b5e958a726d" # This is safe for leaving in, it's just a key on a local dev instance.
+  key = "5c4f665d-c6ec-4ab7-8bf2-a333af82c182" # This is safe for leaving in, it's just a key on a local dev instance.
+}
+
+resource "endpointmonitor_socket_check" "test" {
+  name            = "Local Terraform Socket Test"
+  description     = "Local Terraform Socket Test. Managed by Terraform."
+  check_frequency = 120
+  hostname        = "lttstore.co.uk"
+  port            = 443
+  trigger_count   = 2
+  check_host_id   = endpointmonitor_check_host.test.id
+  check_group_id  = endpointmonitor_check_group.test.id
 }
 
 resource "endpointmonitor_proxy_host" "test" {
@@ -50,15 +61,22 @@ resource "endpointmonitor_url_check" "test" {
   description            = "Terraform URL check descrtiption"
   url                    = "https://www.bbc.co.uk/weather"
   trigger_count          = 2
+  check_frequency        = 60
   request_method         = "GET"
   expected_response_code = 200
   alert_response_time    = 5000
   warning_response_time  = 3000
   timeout                = 10000
   allow_redirects        = true
+
   request_header {
     name  = "Agent"
     value = "EndPoint Monitor"
+  }
+
+    request_header {
+    name  = "Content-Type"
+    value = "application/json"
   }
   check_host_id  = data.endpointmonitor_check_host.test.id
   check_group_id = endpointmonitor_check_group.test.id
@@ -68,7 +86,7 @@ resource "endpointmonitor_dns_check" "test" {
   name               = "Terraform DNS Check"
   description        = "Terraform DNS check descrtiption"
   check_frequency    = 300
-  hostname           = "smnt-read-sql01.net.smnt.co.uk"
+  hostname           = "smnt-edin-sql.net.smnt.co.uk"
   expected_addresses = ["10.20.0.31", "10.20.0.32"]
   trigger_count      = 5
   check_host_id      = endpointmonitor_check_host.test.id
@@ -185,11 +203,12 @@ resource "endpointmonitor_web_journey_common_step" "test" {
 }
 
 resource "endpointmonitor_web_journey_check" "integration_test" {
-  name          = "Integration Web Journey Test"
-  description   = "Integration Web Journey Test. Managed by Terraform."
-  enabled       = true
-  start_url     = "https://koolness.co.uk/test/"
-  trigger_count = 3
+  name            = "Integration Web Journey Test"
+  description     = "Integration Web Journey Test. Managed by Terraform."
+  enabled         = true
+  start_url       = "https://koolness.co.uk/test/"
+  trigger_count   = 3
+  check_frequency = 60
 
   monitor_domain {
     domain              = "mycompany.com"
@@ -227,7 +246,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
     }
 
     action {
-      sequence        = 0
+      sequence        = 1
       description     = "Enter username"
       always_required = true
       type            = "TEXT_INPUT"
@@ -239,7 +258,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
     }
 
     action {
-      sequence        = 1
+      sequence        = 2
       description     = "Enter password"
       always_required = true
       type            = "PASSWORD_INPUT"
@@ -251,7 +270,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
     }
 
     action {
-      sequence        = 2
+      sequence        = 3
       description     = "Click Login"
       always_required = true
       type            = "CLICK"
