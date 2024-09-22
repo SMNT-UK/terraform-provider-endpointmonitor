@@ -27,8 +27,9 @@ resource "endpointmonitor_check_group" "integration_tests" {
 }
 
 resource "endpointmonitor_url_check" "integration_test" {
-  name        = "Integration URL Test"
-  description = "Integration URL Test. Managed by Terraform."
+  name            = "Integration URL Test"
+  description     = "Integration URL Test. Managed by Terraform."
+  check_frequency = 60
 
   check_group_id = endpointmonitor_check_group.integration_tests.id
   check_host_id  = data.endpointmonitor_check_host.epm_01.id
@@ -122,7 +123,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
     }
 
     action {
-      sequence        = 0
+      sequence        = 1
       description     = "Enter username"
       always_required = true
       type            = "TEXT_INPUT"
@@ -134,7 +135,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
     }
 
     action {
-      sequence        = 1
+      sequence        = 2
       description     = "Enter password"
       always_required = true
       type            = "PASSWORD_INPUT"
@@ -146,7 +147,7 @@ resource "endpointmonitor_web_journey_check" "integration_test" {
     }
 
     action {
-      sequence        = 2
+      sequence        = 3
       description     = "Click Login"
       always_required = true
       type            = "CLICK"
