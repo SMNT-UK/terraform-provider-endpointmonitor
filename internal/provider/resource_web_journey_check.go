@@ -573,10 +573,12 @@ func (r *WebJourneyCheckResource) Schema(_ context.Context, _ resource.SchemaReq
 									},
 									"any_client_error": schema.BoolAttribute{
 										Optional:    true,
+										Computed:    true,
 										Description: "Suppress any 400-499 response code for the given url.",
 									},
 									"any_server_error": schema.BoolAttribute{
 										Optional:    true,
+										Computed:    true,
 										Description: "Suppress any 500-599 response code for the given url.",
 									},
 								},
