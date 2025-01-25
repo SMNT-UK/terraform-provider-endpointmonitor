@@ -70,9 +70,9 @@ func (r *CheckHostResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 			},
 			"type": schema.StringAttribute{
 				Required:    true,
-				Description: "Must be either CONTROLLER or AGENT. CONTROLLER is used for hosts that expose the Web GUI and required database access. AGENT is used for hosts that purely just run checks.",
+				Description: "Must be either CONTROLLER, AGENT or ANDROID. CONTROLLER is used for hosts that expose the Web GUI and required database access. AGENT is used for hosts that purely just run checks. ANDROID is a specific type of agent that is capable of running Android Journey checks.",
 				Validators: []validator.String{
-					stringvalidator.OneOf("CONTROLLER", "AGENT"),
+					stringvalidator.OneOf("CONTROLLER", "AGENT", "ANDROID"),
 				},
 			},
 			"max_checks": schema.Int32Attribute{

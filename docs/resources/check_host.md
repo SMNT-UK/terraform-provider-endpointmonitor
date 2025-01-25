@@ -31,7 +31,7 @@ resource "endpointmonitor_check_host" "example" {
 
 - `description` (String) A place to provide more detail about the host if required.
 - `hostname` (String) The hostname of the host. Must match what the host believes its own hostname is.
-- `type` (String) Must be either CONTROLLER or AGENT. CONTROLLER is used for hosts that expose the Web GUI and required database access. AGENT is used for hosts that purely just run checks.
+- `type` (String) Must be either CONTROLLER, AGENT or ANDROID. CONTROLLER is used for hosts that expose the Web GUI and required database access. AGENT is used for hosts that purely just run checks. ANDROID is a specific type of agent that is capable of running Android Journey checks.
 
 ### Optional
 

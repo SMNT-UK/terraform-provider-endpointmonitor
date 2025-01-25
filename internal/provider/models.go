@@ -137,6 +137,110 @@ type UrlCheckModel struct {
 	} `tfsdk:"response_body_check"`
 }
 
+type AndroidJourneyCheckModel struct {
+	CheckCommonModel
+	Apk                  types.String                        `tfsdk:"apk"`
+	ApkChecksum          types.String                        `tfsdk:"apk_checksum"`
+	ScreenOrientation    types.String                        `tfsdk:"screen_orientation"`
+	OverridePackageName  types.String                        `tfsdk:"override_package_name"`
+	OverrideMainActivity types.String                        `tfsdk:"override_main_activity"`
+	CommonSteps          []AndroidJourneyCommonStepStepModel `tfsdk:"common_step"`
+	CustomSteps          []AndroidJourneyCustomStepModel     `tfsdk:"custom_step"`
+}
+
+type AndroidJourneyCustomStepModel struct {
+	Id               types.Int64                   `tfsdk:"id"`
+	Sequence         types.Int32                   `tfsdk:"sequence"`
+	Name             types.String                  `tfsdk:"name"`
+	WaitTime         types.Int32                   `tfsdk:"wait_time"`
+	StepChecks       []AndroidStepCheckModel       `tfsdk:"step_check"`
+	StepInteractions []AndroidStepInteractionModel `tfsdk:"step_interaction"`
+}
+
+type AndroidJourneyCommonStepStepModel struct {
+	Id           types.Int64 `tfsdk:"id"`
+	Sequence     types.Int32 `tfsdk:"sequence"`
+	CommonStepId types.Int64 `tfsdk:"common_step_id"`
+}
+
+type AndroidJourneyCommonStepModel struct {
+	Id               types.Int64                   `tfsdk:"id"`
+	Name             types.String                  `tfsdk:"name"`
+	Description      types.String                  `tfsdk:"description"`
+	WaitTime         types.Int32                   `tfsdk:"wait_time"`
+	StepChecks       []AndroidStepCheckModel       `tfsdk:"step_check"`
+	StepInteractions []AndroidStepInteractionModel `tfsdk:"step_interaction"`
+}
+
+type AndroidStepCheckModel struct {
+	Id              types.Int64                  `tfsdk:"id"`
+	Description     types.String                 `tfsdk:"description"`
+	WarningOnly     types.Bool                   `tfsdk:"warning_only"`
+	Type            types.String                 `tfsdk:"type"`
+	CheckForText    *AndroidCheckForTextModel    `tfsdk:"check_for_text"`
+	CheckForElement *AndroidCheckForElementModel `tfsdk:"check_for_element"`
+}
+
+type AndroidCheckForTextModel struct {
+	Id         types.Int64  `tfsdk:"id"`
+	TextToFind types.String `tfsdk:"text_to_find"`
+	State      types.String `tfsdk:"state"`
+}
+
+type AndroidCheckForElementModel struct {
+	Id             types.Int64  `tfsdk:"id"`
+	ComponentId    types.String `tfsdk:"component_id"`
+	ComponentType  types.String `tfsdk:"component_type"`
+	Xpath          types.String `tfsdk:"xpath"`
+	State          types.String `tfsdk:"state"`
+	AttributeName  types.String `tfsdk:"attribute_name"`
+	AttributeValue types.String `tfsdk:"attribute_value"`
+}
+
+type AndroidStepInteractionModel struct {
+	Id             types.Int64                      `tfsdk:"id"`
+	Sequence       types.Int32                      `tfsdk:"sequence"`
+	Description    types.String                     `tfsdk:"description"`
+	AlwaysRequired types.Bool                       `tfsdk:"always_required"`
+	Type           types.String                     `tfsdk:"type"`
+	WaitTime       types.Int32                      `tfsdk:"wait_time"`
+	Click          *AndroidClickActionModel         `tfsdk:"click"`
+	TextInput      *AndroidInputTextActionModel     `tfsdk:"text_input"`
+	PasswordInput  *AndroidInputPasswordActionModel `tfsdk:"password_input"`
+	RotateDisplay  *AndroidRotateDisplayActionModel `tfsdk:"rotate_display"`
+	Swipe          *AndroidSwipeActionModel         `tfsdk:"swipe"`
+}
+
+type AndroidClickActionModel struct {
+	ComponentId types.String `tfsdk:"component_id"`
+	Xpath       types.String `tfsdk:"xpath"`
+	SearchText  types.String `tfsdk:"search_text"`
+}
+
+type AndroidInputTextActionModel struct {
+	ComponentId types.String `tfsdk:"component_id"`
+	Xpath       types.String `tfsdk:"xpath"`
+	InputText   types.String `tfsdk:"input_text"`
+}
+
+type AndroidInputPasswordActionModel struct {
+	ComponentId   types.String `tfsdk:"component_id"`
+	Xpath         types.String `tfsdk:"xpath"`
+	InputPassword types.String `tfsdk:"input_password"`
+}
+
+type AndroidRotateDisplayActionModel struct {
+	Orientation types.String `tfsdk:"orientation"`
+}
+
+type AndroidSwipeActionModel struct {
+	ComponentId           types.String `tfsdk:"component_id"`
+	Xpath                 types.String `tfsdk:"xpath"`
+	StartSwipeCoordinates types.String `tfsdk:"start_swipe_coordinates"`
+	SwipeDirection        types.String `tfsdk:"swipe_direction"`
+	SwipeLength           types.Int32  `tfsdk:"swipe_length"`
+}
+
 type WebJourneyCheckModel struct {
 	CheckCommonModel
 	StartUrl       types.String `tfsdk:"start_url"`

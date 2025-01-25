@@ -354,6 +354,35 @@ func (c *EndPointMonitorClient) GetUrlCheck(id int64) (*UrlCheckModel, error) {
 	return &checkModel, nil
 }
 
+func (c *EndPointMonitorClient) GetAndroidJourneyCheck(id int64) (*AndroidJourneyCheckModel, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/%d", c.HostURL, id), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	c.HTTPClient.Timeout = time.Minute * 5
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	check := AndroidJourneyCheck{}
+
+	if body != nil {
+		err = json.Unmarshal(body, &check)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, nil
+	}
+
+	checkModel := mapToAndroidJourneyCheckModel(check)
+
+	return &checkModel, nil
+}
+
 func (c *EndPointMonitorClient) GetWebJourneyCheck(id int64) (*WebJourneyCheckModel, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/%d", c.HostURL, id), nil)
 	if err != nil {
@@ -381,8 +410,35 @@ func (c *EndPointMonitorClient) GetWebJourneyCheck(id int64) (*WebJourneyCheckMo
 	return &checkModel, nil
 }
 
+func (c *EndPointMonitorClient) GetCommonAndroidJourneyStep(id int64) (*AndroidJourneyCommonStepModel, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/commonSteps/android/%d", c.HostURL, id), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	step := AndroidJourneyCommonStep{}
+
+	if body != nil {
+		err = json.Unmarshal(body, &step)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, nil
+	}
+
+	stepModel := mapToAndroidJourneyCommonStepModel(step)
+
+	return &stepModel, nil
+}
+
 func (c *EndPointMonitorClient) GetCommonWebJourneyStep(id int64) (*WebJourneyCommonStepModel, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/commonWebJourneySteps/%d", c.HostURL, id), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/commonSteps/web/%d", c.HostURL, id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -738,6 +794,38 @@ func (c *EndPointMonitorClient) CreateUrlCheck(checkModel UrlCheckModel, ctx con
 	return &newCheckModel, nil
 }
 
+func (c *EndPointMonitorClient) CreateAndroidJourneyCheck(checkModel AndroidJourneyCheckModel, ctx context.Context) (*AndroidJourneyCheckModel, error) {
+	check := mapToAndroidJourneyCheck(checkModel)
+
+	rb, err := json.Marshal(check)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/checks/add/androidJourney", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	c.HTTPClient.Timeout = time.Minute * 5
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	newCheck := AndroidJourneyCheck{}
+
+	err = json.Unmarshal(body, &newCheck)
+	if err != nil {
+		return nil, err
+	}
+
+	newCheckModel := mapToAndroidJourneyCheckModel(newCheck)
+
+	return &newCheckModel, nil
+}
+
 func (c *EndPointMonitorClient) CreateWebJourneyCheck(checkModel WebJourneyCheckModel, ctx context.Context) (*WebJourneyCheckModel, error) {
 	check := mapToWebJourneyCheck(checkModel)
 
@@ -768,6 +856,36 @@ func (c *EndPointMonitorClient) CreateWebJourneyCheck(checkModel WebJourneyCheck
 	return &newCheckModel, nil
 }
 
+func (c *EndPointMonitorClient) CreateAndroidJourneyCommonStep(stepModel AndroidJourneyCommonStepModel, ctx context.Context) (*AndroidJourneyCommonStepModel, error) {
+	step := mapToAndroidJourneyCommonStep(stepModel)
+
+	rb, err := json.Marshal(step)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/checks/commonSteps/android/add", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	newStep := AndroidJourneyCommonStep{}
+
+	err = json.Unmarshal(body, &newStep)
+	if err != nil {
+		return nil, err
+	}
+
+	newStepModel := mapToAndroidJourneyCommonStepModel(newStep)
+
+	return &newStepModel, nil
+}
+
 func (c *EndPointMonitorClient) CreateWebJourneyCommonStep(stepModel WebJourneyCommonStepModel, ctx context.Context) (*WebJourneyCommonStepModel, error) {
 	step := mapToWebJourneyCommonStep(stepModel)
 
@@ -776,7 +894,7 @@ func (c *EndPointMonitorClient) CreateWebJourneyCommonStep(stepModel WebJourneyC
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/checks/commonWebJourneySteps/add", c.HostURL), strings.NewReader(string(rb)))
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/checks/commonSteps/web/add", c.HostURL), strings.NewReader(string(rb)))
 	if err != nil {
 		return nil, err
 	}
@@ -1128,6 +1246,38 @@ func (c *EndPointMonitorClient) UpdateUrlCheck(checkModel UrlCheckModel, ctx con
 	return &newCheckModel, nil
 }
 
+func (c *EndPointMonitorClient) UpdateAndroidJourneyCheck(checkModel AndroidJourneyCheckModel, ctx context.Context) (*AndroidJourneyCheckModel, error) {
+	check := mapToAndroidJourneyCheck(checkModel)
+
+	rb, err := json.Marshal(check)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/checks/update/androidJourney", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	c.HTTPClient.Timeout = time.Minute * 5
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	newCheck := AndroidJourneyCheck{}
+
+	err = json.Unmarshal(body, &newCheck)
+	if err != nil {
+		return nil, err
+	}
+
+	newCheckModel := mapToAndroidJourneyCheckModel(newCheck)
+
+	return &newCheckModel, nil
+}
+
 func (c *EndPointMonitorClient) UpdateWebJourneyCheck(checkModel WebJourneyCheckModel, ctx context.Context) (*WebJourneyCheckModel, error) {
 	check := mapToWebJourneyCheck(checkModel)
 
@@ -1158,6 +1308,36 @@ func (c *EndPointMonitorClient) UpdateWebJourneyCheck(checkModel WebJourneyCheck
 	return &newCheckModel, nil
 }
 
+func (c *EndPointMonitorClient) UpdateAndroidJourneyCommonStep(stepModel AndroidJourneyCommonStepModel, ctx context.Context) (*AndroidJourneyCommonStepModel, error) {
+	step := mapToAndroidJourneyCommonStep(stepModel)
+
+	rb, err := json.Marshal(step)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/checks/commonSteps/android/update", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	newStep := AndroidJourneyCommonStep{}
+
+	err = json.Unmarshal(body, &newStep)
+	if err != nil {
+		return nil, err
+	}
+
+	newStepModel := mapToAndroidJourneyCommonStepModel(newStep)
+
+	return &newStepModel, nil
+}
+
 func (c *EndPointMonitorClient) UpdateWebJourneyCommonStep(stepModel WebJourneyCommonStepModel, ctx context.Context) (*WebJourneyCommonStepModel, error) {
 	step := mapToWebJourneyCommonStep(stepModel)
 
@@ -1166,7 +1346,7 @@ func (c *EndPointMonitorClient) UpdateWebJourneyCommonStep(stepModel WebJourneyC
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/checks/commonWebJourneySteps/update", c.HostURL), strings.NewReader(string(rb)))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/checks/commonSteps/web/update", c.HostURL), strings.NewReader(string(rb)))
 	if err != nil {
 		return nil, err
 	}
@@ -1242,8 +1422,26 @@ func (c *EndPointMonitorClient) DeleteCheckHost(id int32) error {
 	return nil
 }
 
-func (c *EndPointMonitorClient) DeleteCommonStep(id int64) error {
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/checks/commonWebJourneySteps/remove/%d", c.HostURL, id), nil)
+func (c *EndPointMonitorClient) DeleteAndroidCommonStep(id int64) error {
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/checks/commonSteps/android/remove/%d", c.HostURL, id), nil)
+	if err != nil {
+		return err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return err
+	}
+
+	if string(body) != "{\"success\":true}" {
+		return errors.New(string(body))
+	}
+
+	return nil
+}
+
+func (c *EndPointMonitorClient) DeleteWebCommonStep(id int64) error {
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/checks/commonSteps/web/remove/%d", c.HostURL, id), nil)
 	if err != nil {
 		return err
 	}
@@ -1549,8 +1747,39 @@ func (c *EndPointMonitorClient) SearchProxyHosts(search string) ([]types.Int32, 
 	return ids, nil
 }
 
+func (c *EndPointMonitorClient) SearchAndroidJoureyCommonSteps(search string) ([]types.Int32, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/commonSteps/android/list?page=0&search=%s", c.HostURL, url.QueryEscape(search)), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	commonStep := []AndroidJourneyCommonStep{}
+
+	if body != nil {
+		err = json.Unmarshal(body, &commonStep)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, nil
+	}
+
+	ids := make([]types.Int32, 0, len(commonStep))
+
+	for _, check := range commonStep {
+		ids = append(ids, types.Int32Value(int32(check.Id)))
+	}
+
+	return ids, nil
+}
+
 func (c *EndPointMonitorClient) SearchWebJoureyCommonSteps(search string) ([]types.Int32, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/commonWebJourneySteps/list?page=0&search=%s", c.HostURL, url.QueryEscape(search)), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/checks/commonSteps/web/list?page=0&search=%s", c.HostURL, url.QueryEscape(search)), nil)
 	if err != nil {
 		return nil, err
 	}

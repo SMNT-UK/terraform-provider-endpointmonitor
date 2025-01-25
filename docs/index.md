@@ -8,8 +8,6 @@ description: |-
 
 # EndPoint Monitor Provider
 
-This provider is for use with [EndPoint Monitor](https://epm.smnt.co.uk/) synthetic monitoring.
-
 The EndPoint Monitor provider allows you to manage most aspects of your synthetic checks through Terraform. This can be especially useful if you have repetition in your monitoring you want to automate the setup of, if you want to dynamically setup monitoring alongside provisioning of your infrastructure through Terraform or just want a logical backup of your checks that can be easily spun up elsewhere if needed.
 
 The provider currently allows management of the following components of EndPoint Monitor:

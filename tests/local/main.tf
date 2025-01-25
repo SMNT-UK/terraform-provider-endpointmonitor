@@ -14,7 +14,6 @@ terraform {
 
 provider "endpointmonitor" {
   url = "http://localhost:8080/api"
-  #url = "http://192.168.44.99:8080/api"
   key = "5c4f665d-c6ec-4ab7-8bf2-a333af82c182" # This is safe for leaving in, it's just a key on a local dev instance.
 }
 
@@ -74,7 +73,7 @@ resource "endpointmonitor_url_check" "test" {
     value = "EndPoint Monitor"
   }
 
-    request_header {
+  request_header {
     name  = "Content-Type"
     value = "application/json"
   }
@@ -320,4 +319,174 @@ resource "endpointmonitor_check_host_group" "test" {
   description    = "Testing Terraform host group resource."
   enabled        = true
   check_host_ids = data.endpointmonitor_check_hosts.test.ids
+}
+
+resource "endpointmonitor_android_journey_check" "android" {
+  name            = "Integration Android Journey Test"
+  description     = "Integration Android Journey Test. Managed by Terraform."
+  enabled         = true
+  trigger_count   = 3
+  check_frequency = 60
+
+  check_host_id  = endpointmonitor_check_host.test.id
+  check_group_id = endpointmonitor_check_group.test.id
+
+  apk = filebase64("${path.module}/test.apk")
+
+  common_step {
+    sequence       = 1
+    common_step_id = endpointmonitor_android_journey_common_step.android_common.id
+  }
+
+  custom_step {
+    sequence  = 2
+    name      = "Handle Your Data Prompt"
+    wait_time = 5000
+
+    step_check {
+      description = "Check Your Data prompt"
+      type        = "CHECK_FOR_TEXT"
+
+      check_for_text {
+        text_to_find = "Your Data"
+        state        = "PRESENT"
+      }
+    }
+
+    step_interaction {
+      sequence        = 1
+      description     = "Close \"Which Sports\" onboarding question."
+      always_required = false
+      type            = "CLICK"
+
+      click {
+        search_text = "Skip"
+      }
+    }
+
+    step_interaction {
+      sequence        = 2
+      description     = "Close Bookmaker Selection"
+      always_required = false
+      type            = "CLICK"
+
+      click {
+        search_text = "+"
+      }
+    }
+
+    step_interaction {
+      sequence        = 3
+      description     = "Accept Your Data prompt"
+      always_required = true
+      type            = "CLICK"
+
+      click {
+        search_text = "Continue"
+      }
+    }
+  }
+
+  custom_step {
+    sequence  = 3
+    name      = "Racecards Displayed"
+    wait_time = 5000
+
+    step_check {
+      description = "Tomorrow's Racecards text shown"
+      type        = "CHECK_FOR_TEXT"
+
+      check_for_text {
+        text_to_find = "TOMORROW'S RACECARDS"
+        state        = "PRESENT"
+      }
+    }
+
+    step_check {
+      description = "Free Bets button shown"
+      type        = "CHECK_FOR_ELEMENT"
+
+      check_for_element {
+        xpath           = "//*[@content-desc='FREE BETS' and @text='']"
+        state           = "PRESENT"
+        attribute_name  = "clickable"
+        attribute_value = "true"
+      }
+    }
+
+    step_interaction {
+      sequence        = 1
+      description     = "Click on first meeting"
+      always_required = true
+      type            = "CLICK"
+
+      click {
+        component_id = "home-screen-todays-racecards-meeting"
+      }
+    }
+
+    step_interaction {
+      sequence        = 2
+      description     = "Wait 2 seconds"
+      always_required = true
+      type            = "WAIT"
+      wait_time       = 2000
+    }
+
+    step_interaction {
+      sequence        = 3
+      description     = "Take Screenshot"
+      always_required = true
+      type            = "SCREENSHOT"
+    }
+  }
+}
+
+resource "endpointmonitor_android_journey_common_step" "android_common" {
+  name        = "Integration Android Common Step"
+  description = "Integration Test Android Common Step - Managed by Terraform"
+  wait_time   = 5000
+
+  step_check {
+    description = "Check for Continue button"
+    type        = "CHECK_FOR_TEXT"
+
+    check_for_text {
+      text_to_find = "Continue"
+      state        = "PRESENT"
+    }
+  }
+  
+  step_interaction {
+    sequence        = 1
+    description     = "Click Continue"
+    always_required = false
+    type            = "CLICK"
+
+    click {
+      search_text = "Continue"
+    }
+  }
+
+  step_interaction {
+    sequence        = 2
+    description     = "Click Skip"
+    always_required = false
+    type            = "CLICK"
+
+    click {
+      search_text = "SKIP"
+    }
+  }
+
+  step_interaction {
+    sequence        = 3
+    description     = "Click Other Skip"
+    always_required = false
+    type            = "CLICK"
+
+    click {
+      search_text = "Skip"
+    }
+  }
 }

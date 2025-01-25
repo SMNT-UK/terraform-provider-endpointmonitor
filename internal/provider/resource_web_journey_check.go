@@ -337,7 +337,7 @@ func (r *WebJourneyCheckResource) Schema(_ context.Context, _ resource.SchemaReq
 											"state": schema.StringAttribute{
 												Optional:    true,
 												Computed:    true,
-												Description: "Must be either PRESENT or ABSENT. PRESENT means the element must be found oth epage for the check to succeed. ABSNET means the element must not be on the page for the check to succeed.",
+												Description: "Must be either PRESENT or ABSENT. PRESENT means the element must be found on the page for the check to succeed. ABSENT means the element must not be on the page for the check to succeed.",
 												Default:     stringdefault.StaticString("PRESENT"),
 												Validators: []validator.String{
 													stringvalidator.OneOf("PRESENT", "ABSENT"),

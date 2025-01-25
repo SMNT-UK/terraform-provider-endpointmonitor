@@ -35,14 +35,14 @@ resource "endpointmonitor_web_journey_check" "example" {
   }
 
   step {
-    sequence       = 0
+    sequence       = 1
     name           = "Initial Page Load Checks"
     type           = "COMMON"
     common_step_id = data.endpointmonitor_web_journey_common_step.initial.id
   }
 
   step {
-    sequence               = 1
+    sequence               = 2
     name                   = "Login"
     type                   = "CUSTOM"
     wait_time              = 5000
@@ -60,7 +60,7 @@ resource "endpointmonitor_web_journey_check" "example" {
     }
 
     action {
-      sequence        = 0
+      sequence        = 1
       description     = "Enter username"
       always_required = true
       type            = "TEXT_INPUT"
@@ -72,7 +72,7 @@ resource "endpointmonitor_web_journey_check" "example" {
     }
 
     action {
-      sequence        = 1
+      sequence        = 2
       description     = "Enter password"
       always_required = true
       type            = "PASSWORD_INPUT"
@@ -84,7 +84,7 @@ resource "endpointmonitor_web_journey_check" "example" {
     }
 
     action {
-      sequence        = 2
+      sequence        = 3
       description     = "Click Login"
       always_required = true
       type            = "CLICK"
@@ -97,7 +97,7 @@ resource "endpointmonitor_web_journey_check" "example" {
   }
 
   step {
-    sequence = 2
+    sequence = 3
     name     = "Check Login Successful"
     type     = "CUSTOM"
 

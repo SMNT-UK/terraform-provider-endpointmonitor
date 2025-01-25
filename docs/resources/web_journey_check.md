@@ -383,7 +383,7 @@ Optional:
 - `elemenet_id` (String) The id of the element to check.
 - `elemenet_name` (String) The name of the element to check.
 - `element_content` (String) Filter element matches out by their content.
-- `state` (String) Must be either PRESENT or ABSENT. PRESENT means the element must be found oth epage for the check to succeed. ABSNET means the element must not be on the page for the check to succeed.
+- `state` (String) Must be either PRESENT or ABSENT. PRESENT means the element must be found on the page for the check to succeed. ABSENT means the element must not be on the page for the check to succeed.
 
 Read-Only:
 

@@ -63,6 +63,16 @@ type UrlCheck struct {
 	ResponseBodyChecks   []ResponseBodyCheck `json:"responseCheckStrings"`
 }
 
+type AndroidJourneyCheck struct {
+	Check
+	Apk                  string               `json:"apk"`
+	ApkChecksum          string               `json:"apkChecksum"`
+	ScreenOrientation    string               `json:"screenOrientation"`
+	OverridePackageName  *string              `json:"overridePackageName"`
+	OverrideMainActivity *string              `json:"overrideMainActivity"`
+	Steps                []AndroidJourneyStep `json:"steps"`
+}
+
 type WebJourneyCheck struct {
 	Check
 	StartURL       string           `json:"startUrl"`
@@ -85,6 +95,99 @@ type ResponseBodyCheck struct {
 type MonitorDomain struct {
 	Domain            string `json:"domain"`
 	IncludeSubDomains bool   `json:"includeSubDomains"`
+}
+
+type AndroidJourneyStep struct {
+	Id               int64                    `json:"id"`
+	Sequence         int                      `json:"sequence"`
+	Type             string                   `json:"type"`
+	Name             string                   `json:"name"`
+	CommonId         *int64                   `json:"commonId"`
+	WaitTime         int                      `json:"waitTime"`
+	StepChecks       []AndroidStepCheck       `json:"stepChecks"`
+	StepInteractions []AndroidStepInteraction `json:"stepInteractions"`
+}
+
+type AndroidJourneyCommonStep struct {
+	Id               int64                    `json:"id"`
+	Name             string                   `json:"name"`
+	Description      *string                  `json:"description"`
+	WaitTime         int                      `json:"waitTime"`
+	StepChecks       []AndroidStepCheck       `json:"stepChecks"`
+	StepInteractions []AndroidStepInteraction `json:"stepInteractions"`
+}
+
+type AndroidStepCheck struct {
+	Id              int64                   `json:"id"`
+	Description     string                  `json:"description"`
+	Type            string                  `json:"type"`
+	WarningOnly     bool                    `json:"warningOnly"`
+	CheckForText    *AndroidCheckForText    `json:"checkForText"`
+	CheckForElement *AndroidCheckForElement `json:"checkForElement"`
+}
+
+type AndroidCheckForText struct {
+	Id         int64  `json:"id"`
+	TextToFind string `json:"textToFind"`
+	State      string `json:"state"`
+}
+
+type AndroidCheckForElement struct {
+	Id             int64   `json:"id"`
+	Xpath          *string `json:"xpath"`
+	ComponentId    *string `json:"componentId"`
+	ComponentType  *string `json:"componentType"`
+	State          string  `json:"state"`
+	AttributeName  *string `json:"attributeName"`
+	AttributeValue *string `json:"attributeValue"`
+}
+
+type AndroidStepInteraction struct {
+	Id                         int64                       `json:"id"`
+	Sequence                   int                         `json:"sequence"`
+	Description                string                      `json:"description"`
+	Action                     string                      `json:"action"`
+	AlwaysRequired             bool                        `json:"alwaysRequired"`
+	AndroidClickAction         *AndroidClickAction         `json:"androidClickAction"`
+	AndroidInputTextAction     *AndroidInputTextAction     `json:"androidInputTextAction"`
+	AndroidInputPasswordAction *AndroidInputPasswordAction `json:"androidInputPasswordAction"`
+	AndroidRotateDisplayAction *AndroidRotateDisplayAction `json:"androidRotateDisplayAction"`
+	AndroidSwipeAction         *AndroidSwipeAction         `json:"androidSwipeAction"`
+	AndroidWaitAction          *AndroidWaitAction          `json:"androidWaitAction"`
+}
+
+type AndroidClickAction struct {
+	ComponentId *string `json:"componentId"`
+	Xpath       *string `json:"xpath"`
+	SearchText  *string `json:"searchText"`
+}
+
+type AndroidInputTextAction struct {
+	ComponentId *string `json:"componentId"`
+	Xpath       *string `json:"xpath"`
+	InputText   string  `json:"inputText"`
+}
+
+type AndroidInputPasswordAction struct {
+	ComponentId *string `json:"componentId"`
+	Xpath       *string `json:"xpath"`
+	Password    string  `json:"password"`
+}
+
+type AndroidRotateDisplayAction struct {
+	Orientation string `json:"orientation"`
+}
+
+type AndroidSwipeAction struct {
+	ComponentId           *string `json:"componentId"`
+	Xpath                 *string `json:"xpath"`
+	SwipeStartCoordinates *string `json:"swipeStartCoordinates"`
+	SwipeDirection        string  `json:"swipeDirection"`
+	SwipeLength           int     `json:"swipeLength"`
+}
+
+type AndroidWaitAction struct {
+	WaitTime int `json:"waitTime"`
 }
 
 type WebJourneyStep struct {
@@ -215,7 +318,7 @@ type WebJourneyAction struct {
 
 type WebJourneyClickAction struct {
 	Xpath       *string `json:"xpath"`
-	SearchText  string  `json:"searchText"`
+	SearchText  *string `json:"searchText"`
 	ElementType *string `json:"elementType"`
 }
 
@@ -453,6 +556,245 @@ func mapToUrlCheck(checkModel UrlCheckModel) UrlCheck {
 	return check
 }
 
+func mapToAndroidJourneyCheck(checkModel AndroidJourneyCheckModel) AndroidJourneyCheck {
+	check := AndroidJourneyCheck{}
+	check.Id = checkModel.Id.ValueInt64()
+	check.Name = checkModel.Name.ValueString()
+	check.Description = checkModel.Description.ValueString()
+	check.Enabled = checkModel.Enabled.ValueBool()
+	check.MaintenanceOverride = checkModel.MaintenanceOverride.ValueBool()
+	check.CheckType = "ANDROID_JOURNEY"
+	check.CheckFrequency = checkModel.CheckFrequency.ValueInt32()
+	check.TriggerCount = checkModel.TriggerCount.ValueInt32()
+	check.ResultRetentionDays = checkModel.ResultRetentionDays.ValueInt32()
+	check.CheckGroup = &CheckGroup{Id: int(checkModel.CheckGroupId.ValueInt32())}
+
+	if !checkModel.CheckHostId.IsNull() {
+		check.CheckHost = &CheckHost{Id: int(checkModel.CheckHostId.ValueInt32())}
+	}
+
+	if !checkModel.CheckGroupId.IsNull() {
+		check.HostGroup = &HostGroup{Id: int(checkModel.HostGroupId.ValueInt32())}
+	}
+
+	//	if !checkModel.ProxyHostId.IsNull() {
+	//		check.ProxyHost = &ProxyHost{Id: int(checkModel.ProxyHostId.ValueInt32())}
+	//	}
+
+	check.Apk = checkModel.Apk.ValueString()
+	check.ApkChecksum = checkModel.ApkChecksum.ValueString()
+	check.ScreenOrientation = checkModel.ScreenOrientation.ValueString()
+	check.OverridePackageName = checkModel.OverridePackageName.ValueStringPointer()
+	check.OverrideMainActivity = checkModel.OverrideMainActivity.ValueStringPointer()
+
+	for _, stepModel := range checkModel.CommonSteps {
+		step := AndroidJourneyStep{}
+		step.Id = stepModel.Id.ValueInt64()
+		step.Sequence = int(stepModel.Sequence.ValueInt32())
+		step.Type = "COMMON"
+		step.CommonId = stepModel.CommonStepId.ValueInt64Pointer()
+
+		check.Steps = append(check.Steps, step)
+	}
+
+	for _, stepModel := range checkModel.CustomSteps {
+		step := AndroidJourneyStep{}
+		step.Id = stepModel.Id.ValueInt64()
+		step.Sequence = int(stepModel.Sequence.ValueInt32())
+		step.Type = "CUSTOM"
+		step.Name = stepModel.Name.ValueString()
+		step.WaitTime = int(stepModel.WaitTime.ValueInt32())
+
+		for _, stepCheckModel := range stepModel.StepChecks {
+			stepCheck := AndroidStepCheck{}
+			stepCheck.Id = stepCheckModel.Id.ValueInt64()
+			stepCheck.Description = stepCheckModel.Description.ValueString()
+			stepCheck.Type = stepCheckModel.Type.ValueString()
+			stepCheck.WarningOnly = stepCheckModel.WarningOnly.ValueBool()
+
+			if stepCheckModel.CheckForText != nil {
+				stepCheck.CheckForText = &AndroidCheckForText{
+					Id:         stepCheckModel.CheckForText.Id.ValueInt64(),
+					TextToFind: stepCheckModel.CheckForText.TextToFind.ValueString(),
+					State:      stepCheckModel.CheckForText.State.ValueString(),
+				}
+			}
+
+			if stepCheckModel.CheckForElement != nil {
+				stepCheck.CheckForElement = &AndroidCheckForElement{
+					Id:             stepCheckModel.CheckForElement.Id.ValueInt64(),
+					Xpath:          stepCheckModel.CheckForElement.Xpath.ValueStringPointer(),
+					ComponentId:    stepCheckModel.CheckForElement.ComponentId.ValueStringPointer(),
+					ComponentType:  stepCheckModel.CheckForElement.ComponentType.ValueStringPointer(),
+					State:          stepCheckModel.CheckForElement.State.ValueString(),
+					AttributeName:  stepCheckModel.CheckForElement.AttributeName.ValueStringPointer(),
+					AttributeValue: stepCheckModel.CheckForElement.AttributeValue.ValueStringPointer(),
+				}
+			}
+
+			step.StepChecks = append(step.StepChecks, stepCheck)
+		}
+
+		for _, stepInteractionModel := range stepModel.StepInteractions {
+			stepInteraction := AndroidStepInteraction{}
+			stepInteraction.Id = stepInteractionModel.Id.ValueInt64()
+			stepInteraction.Sequence = int(stepInteractionModel.Sequence.ValueInt32())
+			stepInteraction.Description = stepInteractionModel.Description.ValueString()
+			stepInteraction.Action = stepInteractionModel.Type.ValueString()
+			stepInteraction.AlwaysRequired = stepInteractionModel.AlwaysRequired.ValueBool()
+
+			if stepInteractionModel.Click != nil {
+				stepInteraction.AndroidClickAction = &AndroidClickAction{
+					ComponentId: stepInteractionModel.Click.ComponentId.ValueStringPointer(),
+					Xpath:       stepInteractionModel.Click.Xpath.ValueStringPointer(),
+					SearchText:  stepInteractionModel.Click.SearchText.ValueStringPointer(),
+				}
+			}
+
+			if stepInteractionModel.TextInput != nil {
+				stepInteraction.AndroidInputTextAction = &AndroidInputTextAction{
+					ComponentId: stepInteractionModel.TextInput.ComponentId.ValueStringPointer(),
+					Xpath:       stepInteractionModel.TextInput.Xpath.ValueStringPointer(),
+					InputText:   stepInteractionModel.TextInput.InputText.ValueString(),
+				}
+			}
+
+			if stepInteractionModel.PasswordInput != nil {
+				stepInteraction.AndroidInputPasswordAction = &AndroidInputPasswordAction{
+					ComponentId: stepInteractionModel.PasswordInput.ComponentId.ValueStringPointer(),
+					Xpath:       stepInteractionModel.PasswordInput.Xpath.ValueStringPointer(),
+					Password:    stepInteractionModel.PasswordInput.InputPassword.ValueString(),
+				}
+			}
+
+			if stepInteractionModel.RotateDisplay != nil {
+				stepInteraction.AndroidRotateDisplayAction = &AndroidRotateDisplayAction{
+					Orientation: stepInteractionModel.RotateDisplay.Orientation.ValueString(),
+				}
+			}
+
+			if stepInteractionModel.Swipe != nil {
+				stepInteraction.AndroidSwipeAction = &AndroidSwipeAction{
+					ComponentId:           stepInteractionModel.Swipe.ComponentId.ValueStringPointer(),
+					Xpath:                 stepInteractionModel.Swipe.Xpath.ValueStringPointer(),
+					SwipeStartCoordinates: stepInteractionModel.Swipe.StartSwipeCoordinates.ValueStringPointer(),
+					SwipeDirection:        stepInteractionModel.Swipe.SwipeDirection.ValueString(),
+					SwipeLength:           int(stepInteractionModel.Swipe.SwipeLength.ValueInt32()),
+				}
+			}
+
+			if !stepInteractionModel.WaitTime.IsNull() {
+				stepInteraction.AndroidWaitAction = &AndroidWaitAction{
+					WaitTime: int(stepInteractionModel.WaitTime.ValueInt32()),
+				}
+			}
+
+			step.StepInteractions = append(step.StepInteractions, stepInteraction)
+		}
+
+		check.Steps = append(check.Steps, step)
+	}
+
+	return check
+}
+
+func mapToAndroidJourneyCommonStep(stepModel AndroidJourneyCommonStepModel) AndroidJourneyCommonStep {
+	step := AndroidJourneyCommonStep{}
+	step.Id = stepModel.Id.ValueInt64()
+	step.Name = stepModel.Name.ValueString()
+	step.Description = stepModel.Description.ValueStringPointer()
+	step.WaitTime = int(stepModel.WaitTime.ValueInt32())
+
+	for _, stepCheckModel := range stepModel.StepChecks {
+		stepCheck := AndroidStepCheck{}
+		stepCheck.Id = stepCheckModel.Id.ValueInt64()
+		stepCheck.Description = stepCheckModel.Description.ValueString()
+		stepCheck.Type = stepCheckModel.Type.ValueString()
+		stepCheck.WarningOnly = stepCheckModel.WarningOnly.ValueBool()
+
+		if stepCheckModel.CheckForText != nil {
+			stepCheck.CheckForText = &AndroidCheckForText{
+				Id:         stepCheckModel.CheckForText.Id.ValueInt64(),
+				TextToFind: stepCheckModel.CheckForText.TextToFind.ValueString(),
+				State:      stepCheckModel.CheckForText.State.ValueString(),
+			}
+		}
+
+		if stepCheckModel.CheckForElement != nil {
+			stepCheck.CheckForElement = &AndroidCheckForElement{
+				Id:             stepCheckModel.CheckForElement.Id.ValueInt64(),
+				Xpath:          stepCheckModel.CheckForElement.Xpath.ValueStringPointer(),
+				ComponentId:    stepCheckModel.CheckForElement.ComponentId.ValueStringPointer(),
+				ComponentType:  stepCheckModel.CheckForElement.ComponentType.ValueStringPointer(),
+				State:          stepCheckModel.CheckForElement.State.ValueString(),
+				AttributeName:  stepCheckModel.CheckForElement.AttributeName.ValueStringPointer(),
+				AttributeValue: stepCheckModel.CheckForElement.AttributeValue.ValueStringPointer(),
+			}
+		}
+
+		step.StepChecks = append(step.StepChecks, stepCheck)
+	}
+
+	for _, stepInteractionModel := range stepModel.StepInteractions {
+		stepInteraction := AndroidStepInteraction{}
+		stepInteraction.Id = stepInteractionModel.Id.ValueInt64()
+		stepInteraction.Sequence = int(stepInteractionModel.Sequence.ValueInt32())
+		stepInteraction.Description = stepInteractionModel.Description.ValueString()
+		stepInteraction.Action = stepInteractionModel.Type.ValueString()
+		stepInteraction.AlwaysRequired = stepInteractionModel.AlwaysRequired.ValueBool()
+
+		if stepInteractionModel.Click != nil {
+			stepInteraction.AndroidClickAction = &AndroidClickAction{
+				ComponentId: stepInteractionModel.Click.ComponentId.ValueStringPointer(),
+				Xpath:       stepInteractionModel.Click.Xpath.ValueStringPointer(),
+				SearchText:  stepInteractionModel.Click.SearchText.ValueStringPointer(),
+			}
+		}
+
+		if stepInteractionModel.TextInput != nil {
+			stepInteraction.AndroidInputTextAction = &AndroidInputTextAction{
+				ComponentId: stepInteractionModel.TextInput.ComponentId.ValueStringPointer(),
+				Xpath:       stepInteractionModel.TextInput.Xpath.ValueStringPointer(),
+				InputText:   stepInteractionModel.TextInput.InputText.ValueString(),
+			}
+		}
+
+		if stepInteractionModel.PasswordInput != nil {
+			stepInteraction.AndroidInputPasswordAction = &AndroidInputPasswordAction{
+				ComponentId: stepInteractionModel.PasswordInput.ComponentId.ValueStringPointer(),
+				Xpath:       stepInteractionModel.PasswordInput.Xpath.ValueStringPointer(),
+				Password:    stepInteractionModel.PasswordInput.InputPassword.ValueString(),
+			}
+		}
+
+		if stepInteractionModel.RotateDisplay != nil {
+			stepInteraction.AndroidRotateDisplayAction = &AndroidRotateDisplayAction{
+				Orientation: stepInteractionModel.RotateDisplay.Orientation.ValueString(),
+			}
+		}
+
+		if stepInteractionModel.Swipe != nil {
+			stepInteraction.AndroidSwipeAction = &AndroidSwipeAction{
+				ComponentId:           stepInteractionModel.Swipe.ComponentId.ValueStringPointer(),
+				Xpath:                 stepInteractionModel.Swipe.Xpath.ValueStringPointer(),
+				SwipeStartCoordinates: stepInteractionModel.Swipe.StartSwipeCoordinates.ValueStringPointer(),
+				SwipeDirection:        stepInteractionModel.Swipe.SwipeDirection.ValueString(),
+				SwipeLength:           int(stepInteractionModel.Swipe.SwipeLength.ValueInt32()),
+			}
+		}
+
+		if !stepInteractionModel.WaitTime.IsNull() {
+			stepInteraction.AndroidWaitAction = &AndroidWaitAction{
+				WaitTime: int(stepInteractionModel.WaitTime.ValueInt32()),
+			}
+		}
+
+		step.StepInteractions = append(step.StepInteractions, stepInteraction)
+	}
+
+	return step
+}
+
 func mapToWebJourneyCheck(checkModel WebJourneyCheckModel) WebJourneyCheck {
 	check := WebJourneyCheck{}
 	check.Id = checkModel.Id.ValueInt64()
@@ -606,21 +948,21 @@ func mapToWebJourneyCheck(checkModel WebJourneyCheckModel) WebJourneyCheck {
 				action.WebJourneyClickAction = &WebJourneyClickAction{
 					Xpath:       actionModel.Click.Xpath.ValueStringPointer(),
 					ElementType: actionModel.Click.ElementType.ValueStringPointer(),
-					SearchText:  actionModel.Click.SearchText.ValueString(),
+					SearchText:  actionModel.Click.SearchText.ValueStringPointer(),
 				}
 
 			case "DOUBLE_CLICK":
 				action.WebJourneyDoubleClickAction = &WebJourneyClickAction{
 					Xpath:       actionModel.Click.Xpath.ValueStringPointer(),
 					ElementType: actionModel.Click.ElementType.ValueStringPointer(),
-					SearchText:  actionModel.Click.SearchText.ValueString(),
+					SearchText:  actionModel.Click.SearchText.ValueStringPointer(),
 				}
 
 			case "RIGHT_CLICK":
 				action.WebJourneyRightClickAction = &WebJourneyClickAction{
 					Xpath:       actionModel.Click.Xpath.ValueStringPointer(),
 					ElementType: actionModel.Click.ElementType.ValueStringPointer(),
-					SearchText:  actionModel.Click.SearchText.ValueString(),
+					SearchText:  actionModel.Click.SearchText.ValueStringPointer(),
 				}
 
 			case "TEXT_INPUT":
@@ -810,21 +1152,21 @@ func mapToWebJourneyCommonStep(stepModel WebJourneyCommonStepModel) WebJourneyCo
 			action.WebJourneyClickAction = &WebJourneyClickAction{
 				Xpath:       actionModel.Click.Xpath.ValueStringPointer(),
 				ElementType: actionModel.Click.ElementType.ValueStringPointer(),
-				SearchText:  actionModel.Click.SearchText.ValueString(),
+				SearchText:  actionModel.Click.SearchText.ValueStringPointer(),
 			}
 
 		case "DOUBLE_CLICK":
 			action.WebJourneyDoubleClickAction = &WebJourneyClickAction{
 				Xpath:       actionModel.Click.Xpath.ValueStringPointer(),
 				ElementType: actionModel.Click.ElementType.ValueStringPointer(),
-				SearchText:  actionModel.Click.SearchText.ValueString(),
+				SearchText:  actionModel.Click.SearchText.ValueStringPointer(),
 			}
 
 		case "RIGHT_CLICK":
 			action.WebJourneyRightClickAction = &WebJourneyClickAction{
 				Xpath:       actionModel.Click.Xpath.ValueStringPointer(),
 				ElementType: actionModel.Click.ElementType.ValueStringPointer(),
-				SearchText:  actionModel.Click.SearchText.ValueString(),
+				SearchText:  actionModel.Click.SearchText.ValueStringPointer(),
 			}
 
 		case "TEXT_INPUT":
@@ -1091,6 +1433,238 @@ func mapToUrlCheckModel(check UrlCheck) UrlCheckModel {
 	return checkModel
 }
 
+func mapToAndroidJourneyCheckModel(check AndroidJourneyCheck) AndroidJourneyCheckModel {
+	checkModel := AndroidJourneyCheckModel{}
+	checkModel.Id = types.Int64Value(check.Id)
+	checkModel.Name = types.StringValue(check.Name)
+	checkModel.Description = types.StringValue(check.Description)
+	checkModel.Enabled = types.BoolValue(check.Enabled)
+	checkModel.MaintenanceOverride = types.BoolValue(check.MaintenanceOverride)
+	checkModel.CheckFrequency = types.Int32Value(check.CheckFrequency)
+	checkModel.TriggerCount = types.Int32Value(check.TriggerCount)
+	checkModel.ResultRetentionDays = types.Int32Value(check.ResultRetentionDays)
+
+	if check.CheckHost != nil {
+		checkModel.CheckHostId = types.Int32Value(int32(check.CheckHost.Id))
+	}
+
+	if check.HostGroup != nil {
+		checkModel.HostGroupId = types.Int32Value(int32(check.HostGroup.Id))
+	}
+
+	if check.CheckGroup != nil {
+		checkModel.CheckGroupId = types.Int32Value(int32(check.CheckGroup.Id))
+	}
+
+	checkModel.Apk = types.StringValue(check.Apk)
+	checkModel.ApkChecksum = types.StringValue(check.ApkChecksum)
+	checkModel.ScreenOrientation = types.StringValue(check.ScreenOrientation)
+	checkModel.OverridePackageName = types.StringPointerValue(check.OverridePackageName)
+	checkModel.OverrideMainActivity = types.StringPointerValue(check.OverrideMainActivity)
+
+	for _, step := range check.Steps {
+		if step.Type == "COMMON" {
+			stepModel := AndroidJourneyCommonStepStepModel{}
+			stepModel.Id = types.Int64Value(step.Id)
+			stepModel.Sequence = types.Int32Value(int32(step.Sequence))
+			stepModel.CommonStepId = types.Int64Value(*step.CommonId)
+
+			checkModel.CommonSteps = append(checkModel.CommonSteps, stepModel)
+			continue
+		}
+
+		stepModel := AndroidJourneyCustomStepModel{}
+		stepModel.Id = types.Int64Value(step.Id)
+		stepModel.Sequence = types.Int32Value(int32(step.Sequence))
+		stepModel.Name = types.StringValue(step.Name)
+		stepModel.WaitTime = types.Int32Value(int32(step.WaitTime))
+
+		for _, stepCheck := range step.StepChecks {
+			stepCheckModel := AndroidStepCheckModel{}
+			stepCheckModel.Id = types.Int64Value(stepCheck.Id)
+			stepCheckModel.Description = types.StringValue(stepCheck.Description)
+			stepCheckModel.Type = types.StringValue(stepCheck.Type)
+			stepCheckModel.WarningOnly = types.BoolValue(stepCheck.WarningOnly)
+
+			if stepCheck.CheckForText != nil {
+				stepCheckModel.CheckForText = &AndroidCheckForTextModel{
+					Id:         types.Int64Value(stepCheck.CheckForText.Id),
+					TextToFind: types.StringValue(stepCheck.CheckForText.TextToFind),
+					State:      types.StringValue(stepCheck.CheckForText.State),
+				}
+			}
+
+			if stepCheck.CheckForElement != nil {
+				stepCheckModel.CheckForElement = &AndroidCheckForElementModel{
+					Id:             types.Int64Value(stepCheck.CheckForElement.Id),
+					Xpath:          types.StringPointerValue(stepCheck.CheckForElement.Xpath),
+					ComponentId:    types.StringPointerValue(stepCheck.CheckForElement.ComponentId),
+					ComponentType:  types.StringPointerValue(stepCheck.CheckForElement.ComponentType),
+					State:          types.StringValue(stepCheck.CheckForElement.State),
+					AttributeName:  types.StringPointerValue(stepCheck.CheckForElement.AttributeName),
+					AttributeValue: types.StringPointerValue(stepCheck.CheckForElement.AttributeValue),
+				}
+			}
+
+			stepModel.StepChecks = append(stepModel.StepChecks, stepCheckModel)
+		}
+
+		for _, interaction := range step.StepInteractions {
+			interactionModel := AndroidStepInteractionModel{}
+			interactionModel.Id = types.Int64Value(interaction.Id)
+			interactionModel.Sequence = types.Int32Value(int32(interaction.Sequence))
+			interactionModel.Description = types.StringValue(interaction.Description)
+			interactionModel.Type = types.StringValue(interaction.Action)
+			interactionModel.AlwaysRequired = types.BoolValue(interaction.AlwaysRequired)
+
+			if interaction.AndroidClickAction != nil {
+				interactionModel.Click = &AndroidClickActionModel{
+					ComponentId: types.StringPointerValue(interaction.AndroidClickAction.ComponentId),
+					Xpath:       types.StringPointerValue(interaction.AndroidClickAction.Xpath),
+					SearchText:  types.StringPointerValue(interaction.AndroidClickAction.SearchText),
+				}
+			}
+
+			if interaction.AndroidInputTextAction != nil {
+				interactionModel.TextInput = &AndroidInputTextActionModel{
+					ComponentId: types.StringPointerValue(interaction.AndroidInputTextAction.ComponentId),
+					Xpath:       types.StringPointerValue(interaction.AndroidInputTextAction.Xpath),
+					InputText:   types.StringValue(interaction.AndroidInputTextAction.InputText),
+				}
+			}
+
+			if interaction.AndroidInputPasswordAction != nil {
+				interactionModel.PasswordInput = &AndroidInputPasswordActionModel{
+					ComponentId:   types.StringPointerValue(interaction.AndroidInputPasswordAction.ComponentId),
+					Xpath:         types.StringPointerValue(interaction.AndroidInputPasswordAction.Xpath),
+					InputPassword: types.StringValue(interaction.AndroidInputPasswordAction.Password),
+				}
+			}
+
+			if interaction.AndroidRotateDisplayAction != nil {
+				interactionModel.RotateDisplay = &AndroidRotateDisplayActionModel{
+					Orientation: types.StringValue(interaction.AndroidRotateDisplayAction.Orientation),
+				}
+			}
+
+			if interaction.AndroidSwipeAction != nil {
+				interactionModel.Swipe = &AndroidSwipeActionModel{
+					ComponentId:           types.StringPointerValue(interaction.AndroidSwipeAction.ComponentId),
+					Xpath:                 types.StringPointerValue(interaction.AndroidSwipeAction.Xpath),
+					StartSwipeCoordinates: types.StringPointerValue(interaction.AndroidSwipeAction.SwipeStartCoordinates),
+					SwipeDirection:        types.StringValue(interaction.AndroidSwipeAction.SwipeDirection),
+					SwipeLength:           types.Int32Value(int32(interaction.AndroidSwipeAction.SwipeLength)),
+				}
+			}
+
+			if interaction.AndroidWaitAction != nil {
+				interactionModel.WaitTime = types.Int32Value(int32(interaction.AndroidWaitAction.WaitTime))
+			}
+
+			stepModel.StepInteractions = append(stepModel.StepInteractions, interactionModel)
+		}
+
+		checkModel.CustomSteps = append(checkModel.CustomSteps, stepModel)
+	}
+
+	return checkModel
+}
+
+func mapToAndroidJourneyCommonStepModel(step AndroidJourneyCommonStep) AndroidJourneyCommonStepModel {
+	stepModel := AndroidJourneyCommonStepModel{}
+	stepModel.Id = types.Int64Value(step.Id)
+	stepModel.Name = types.StringValue(step.Name)
+	stepModel.Description = types.StringPointerValue(step.Description)
+	stepModel.WaitTime = types.Int32Value(int32(step.WaitTime))
+
+	for _, stepCheck := range step.StepChecks {
+		stepCheckModel := AndroidStepCheckModel{}
+		stepCheckModel.Id = types.Int64Value(stepCheck.Id)
+		stepCheckModel.Description = types.StringValue(stepCheck.Description)
+		stepCheckModel.Type = types.StringValue(stepCheck.Type)
+		stepCheckModel.WarningOnly = types.BoolValue(stepCheck.WarningOnly)
+
+		if stepCheck.CheckForText != nil {
+			stepCheckModel.CheckForText = &AndroidCheckForTextModel{
+				Id:         types.Int64Value(stepCheck.CheckForText.Id),
+				TextToFind: types.StringValue(stepCheck.CheckForText.TextToFind),
+				State:      types.StringValue(stepCheck.CheckForText.State),
+			}
+		}
+
+		if stepCheck.CheckForElement != nil {
+			stepCheckModel.CheckForElement = &AndroidCheckForElementModel{
+				Id:             types.Int64Value(stepCheck.CheckForElement.Id),
+				Xpath:          types.StringPointerValue(stepCheck.CheckForElement.Xpath),
+				ComponentId:    types.StringPointerValue(stepCheck.CheckForElement.ComponentId),
+				ComponentType:  types.StringPointerValue(stepCheck.CheckForElement.ComponentType),
+				State:          types.StringValue(stepCheck.CheckForElement.State),
+				AttributeName:  types.StringPointerValue(stepCheck.CheckForElement.AttributeName),
+				AttributeValue: types.StringPointerValue(stepCheck.CheckForElement.AttributeValue),
+			}
+		}
+
+		stepModel.StepChecks = append(stepModel.StepChecks, stepCheckModel)
+	}
+
+	for _, interaction := range step.StepInteractions {
+		interactionModel := AndroidStepInteractionModel{}
+		interactionModel.Id = types.Int64Value(interaction.Id)
+		interactionModel.Sequence = types.Int32Value(int32(interaction.Sequence))
+		interactionModel.Description = types.StringValue(interaction.Description)
+		interactionModel.Type = types.StringValue(interaction.Action)
+		interactionModel.AlwaysRequired = types.BoolValue(interaction.AlwaysRequired)
+
+		if interaction.AndroidClickAction != nil {
+			interactionModel.Click = &AndroidClickActionModel{
+				ComponentId: types.StringPointerValue(interaction.AndroidClickAction.ComponentId),
+				Xpath:       types.StringPointerValue(interaction.AndroidClickAction.Xpath),
+				SearchText:  types.StringPointerValue(interaction.AndroidClickAction.SearchText),
+			}
+		}
+
+		if interaction.AndroidInputTextAction != nil {
+			interactionModel.TextInput = &AndroidInputTextActionModel{
+				ComponentId: types.StringPointerValue(interaction.AndroidInputTextAction.ComponentId),
+				Xpath:       types.StringPointerValue(interaction.AndroidInputTextAction.Xpath),
+				InputText:   types.StringValue(interaction.AndroidInputTextAction.InputText),
+			}
+		}
+
+		if interaction.AndroidInputPasswordAction != nil {
+			interactionModel.PasswordInput = &AndroidInputPasswordActionModel{
+				ComponentId:   types.StringPointerValue(interaction.AndroidInputPasswordAction.ComponentId),
+				Xpath:         types.StringPointerValue(interaction.AndroidInputPasswordAction.Xpath),
+				InputPassword: types.StringValue(interaction.AndroidInputPasswordAction.Password),
+			}
+		}
+
+		if interaction.AndroidRotateDisplayAction != nil {
+			interactionModel.RotateDisplay = &AndroidRotateDisplayActionModel{
+				Orientation: types.StringValue(interaction.AndroidRotateDisplayAction.Orientation),
+			}
+		}
+
+		if interaction.AndroidSwipeAction != nil {
+			interactionModel.Swipe = &AndroidSwipeActionModel{
+				ComponentId:           types.StringPointerValue(interaction.AndroidSwipeAction.ComponentId),
+				Xpath:                 types.StringPointerValue(interaction.AndroidSwipeAction.Xpath),
+				StartSwipeCoordinates: types.StringPointerValue(interaction.AndroidSwipeAction.SwipeStartCoordinates),
+				SwipeDirection:        types.StringValue(interaction.AndroidSwipeAction.SwipeDirection),
+				SwipeLength:           types.Int32Value(int32(interaction.AndroidSwipeAction.SwipeLength)),
+			}
+		}
+
+		if interaction.AndroidWaitAction != nil {
+			interactionModel.WaitTime = types.Int32Value(int32(interaction.AndroidWaitAction.WaitTime))
+		}
+
+		stepModel.StepInteractions = append(stepModel.StepInteractions, interactionModel)
+	}
+
+	return stepModel
+}
+
 func mapToWebJourneyCheckModel(check WebJourneyCheck) WebJourneyCheckModel {
 	checkModel := WebJourneyCheckModel{}
 	checkModel.Id = types.Int64Value(check.Id)
@@ -1249,7 +1823,7 @@ func mapToWebJourneyCheckModel(check WebJourneyCheck) WebJourneyCheckModel {
 					actionModel.Click = &WebJourneyActionClickModel{
 						Xpath:       types.StringPointerValue(action.WebJourneyClickAction.Xpath),
 						ElementType: types.StringPointerValue(action.WebJourneyClickAction.ElementType),
-						SearchText:  types.StringValue(action.WebJourneyClickAction.SearchText),
+						SearchText:  types.StringPointerValue(action.WebJourneyClickAction.SearchText),
 					}
 				}
 
@@ -1258,7 +1832,7 @@ func mapToWebJourneyCheckModel(check WebJourneyCheck) WebJourneyCheckModel {
 					actionModel.Click = &WebJourneyActionClickModel{
 						Xpath:       types.StringPointerValue(action.WebJourneyDoubleClickAction.Xpath),
 						ElementType: types.StringPointerValue(action.WebJourneyDoubleClickAction.ElementType),
-						SearchText:  types.StringValue(action.WebJourneyDoubleClickAction.SearchText),
+						SearchText:  types.StringPointerValue(action.WebJourneyDoubleClickAction.SearchText),
 					}
 				}
 
@@ -1267,7 +1841,7 @@ func mapToWebJourneyCheckModel(check WebJourneyCheck) WebJourneyCheckModel {
 					actionModel.Click = &WebJourneyActionClickModel{
 						Xpath:       types.StringPointerValue(action.WebJourneyRightClickAction.Xpath),
 						ElementType: types.StringPointerValue(action.WebJourneyRightClickAction.ElementType),
-						SearchText:  types.StringValue(action.WebJourneyRightClickAction.SearchText),
+						SearchText:  types.StringPointerValue(action.WebJourneyRightClickAction.SearchText),
 					}
 				}
 
@@ -1465,7 +2039,7 @@ func mapToWebJourneyCommonStepModel(step WebJourneyCommonStep) WebJourneyCommonS
 				actionModel.Click = &WebJourneyActionClickModel{
 					Xpath:       types.StringPointerValue(action.WebJourneyClickAction.Xpath),
 					ElementType: types.StringPointerValue(action.WebJourneyClickAction.ElementType),
-					SearchText:  types.StringValue(action.WebJourneyClickAction.SearchText),
+					SearchText:  types.StringPointerValue(action.WebJourneyClickAction.SearchText),
 				}
 			}
 
@@ -1474,7 +2048,7 @@ func mapToWebJourneyCommonStepModel(step WebJourneyCommonStep) WebJourneyCommonS
 				actionModel.Click = &WebJourneyActionClickModel{
 					Xpath:       types.StringPointerValue(action.WebJourneyDoubleClickAction.Xpath),
 					ElementType: types.StringPointerValue(action.WebJourneyDoubleClickAction.ElementType),
-					SearchText:  types.StringValue(action.WebJourneyDoubleClickAction.SearchText),
+					SearchText:  types.StringPointerValue(action.WebJourneyDoubleClickAction.SearchText),
 				}
 			}
 
@@ -1483,7 +2057,7 @@ func mapToWebJourneyCommonStepModel(step WebJourneyCommonStep) WebJourneyCommonS
 				actionModel.Click = &WebJourneyActionClickModel{
 					Xpath:       types.StringPointerValue(action.WebJourneyRightClickAction.Xpath),
 					ElementType: types.StringPointerValue(action.WebJourneyRightClickAction.ElementType),
-					SearchText:  types.StringValue(action.WebJourneyRightClickAction.SearchText),
+					SearchText:  types.StringPointerValue(action.WebJourneyRightClickAction.SearchText),
 				}
 			}
 

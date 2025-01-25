@@ -216,7 +216,7 @@ resource "endpointmonitor_web_journey_common_step" "initial" {
   }
 
   console_message_suppression {
-    description = "Supress CSP Error"
+    description = "Suppress CSP Error"
     log_level   = "ERROR"
     message     = "Content Security Policy directive: \"frame-ancestors 'self'\"."
     comparison  = "ENDS_WITH"

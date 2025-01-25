@@ -192,7 +192,7 @@ func (r *WebJourneyCommonStepResource) Schema(_ context.Context, _ resource.Sche
 								"state": schema.StringAttribute{
 									Optional:    true,
 									Computed:    true,
-									Description: "Must be either PRESENT or ABSENT. PRESENT means the element must be found oth epage for the check to succeed. ABSNET means the element must not be on the page for the check to succeed.",
+									Description: "Must be either PRESENT or ABSENT. PRESENT means the element must be found on the page for the check to succeed. ABSENT means the element must not be on the page for the check to succeed.",
 									Default:     stringdefault.StaticString("PRESENT"),
 									Validators: []validator.String{
 										stringvalidator.OneOf("PRESENT", "ABSENT"),
@@ -886,7 +886,7 @@ func (r *WebJourneyCommonStepResource) Update(ctx context.Context, req resource.
 func (r *WebJourneyCommonStepResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var plan WebJourneyCommonStepModel
 	req.State.Get(ctx, &plan)
-	err := r.client.DeleteCommonStep(plan.Id.ValueInt64())
+	err := r.client.DeleteWebCommonStep(plan.Id.ValueInt64())
 
 	if err != nil {
 		resp.Diagnostics.AddError(

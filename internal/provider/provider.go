@@ -27,13 +27,11 @@ func New(version string) func() provider.Provider {
 	}
 }
 
-// hashicupsProviderModel maps provider schema data to a Go type.
 type endPointMonitorProviderModel struct {
 	Url types.String `tfsdk:"url"`
 	Key types.String `tfsdk:"key"`
 }
 
-// hashicupsProvider is the provider implementation.
 type endPointMonitorProvider struct {
 	// version is set to the provider version on release, "dev" when the
 	// provider is built and ran locally, and "test" when running acceptance
@@ -119,7 +117,7 @@ func (p *endPointMonitorProvider) Configure(ctx context.Context, req provider.Co
 		resp.Diagnostics.AddAttributeError(
 			path.Root("host"),
 			"Missing EndPointMonitor URL",
-			"The provider cannot create the EndPointMonitor client as there is a missing or empty value for the HashiCups API host. "+
+			"The provider cannot create the EndPointMonitor client as there is a missing or empty value for the EndPointMonitor API host. "+
 				"Set the host value in the configuration or use the EPM_URL environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
@@ -143,9 +141,9 @@ func (p *endPointMonitorProvider) Configure(ctx context.Context, req provider.Co
 	ctx = tflog.SetField(ctx, "endpointmonitor_key", key)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "endpointmonitor_key")
 
-	tflog.Debug(ctx, "Creating HashiCups client")
+	tflog.Debug(ctx, "Creating EndPoint Monitor client")
 
-	// Create a new HashiCups client using the configuration values
+	// Create a new EPM client using the configuration values
 	client, err := NewEPMClient(url, &key)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -157,7 +155,7 @@ func (p *endPointMonitorProvider) Configure(ctx context.Context, req provider.Co
 		return
 	}
 
-	// Make the HashiCups client available during DataSource and Resource
+	// Make the EndPointMonitor client available during DataSource and Resource
 	// type Configure methods.
 	resp.DataSourceData = client
 	resp.ResourceData = client
@@ -182,6 +180,8 @@ func (p *endPointMonitorProvider) DataSources(_ context.Context) []func() dataso
 		NewMaintenancePeriodsDataSource,
 		NewProxyHostDataSource,
 		NewProxyHostsDataSource,
+		NewAndroidJourneyCommonStepDataSource,
+		NewAndroidJourneyCommonStepsDataSource,
 		NewWebJourneyCommonStepDataSource,
 		NewWebJourneyCommonStepsDataSource,
 	}
@@ -195,6 +195,8 @@ func (p *endPointMonitorProvider) Resources(_ context.Context) []func() resource
 		NewCertificateCheckResource,
 		NewPingCheckResource,
 		NewSocketCheckResource,
+		NewAndroidJourneyCommonStepResource,
+		NewAndroidJourneyCheckResource,
 		NewWebJourneyCheckResource,
 		NewWebJourneyCommonStepResource,
 		NewCheckGroupResource,
