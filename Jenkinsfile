@@ -36,6 +36,7 @@ pipeline {
                     unstash "terraform-provider-endpointmonitor"
 
                     withCredentials([file(credentialsId: 'reading-internal-ca-cert', variable: 'FILE')]) {
+                        sh "apk add ca-certificates"
                         sh "cp $FILE /usr/local/share/ca-certificates/"
                         sh "update-ca-certificates"
                     }
