@@ -198,17 +198,18 @@ type AndroidCheckForElementModel struct {
 }
 
 type AndroidStepInteractionModel struct {
-	Id             types.Int64                      `tfsdk:"id"`
-	Sequence       types.Int32                      `tfsdk:"sequence"`
-	Description    types.String                     `tfsdk:"description"`
-	AlwaysRequired types.Bool                       `tfsdk:"always_required"`
-	Type           types.String                     `tfsdk:"type"`
-	WaitTime       types.Int32                      `tfsdk:"wait_time"`
-	Click          *AndroidClickActionModel         `tfsdk:"click"`
-	TextInput      *AndroidInputTextActionModel     `tfsdk:"text_input"`
-	PasswordInput  *AndroidInputPasswordActionModel `tfsdk:"password_input"`
-	RotateDisplay  *AndroidRotateDisplayActionModel `tfsdk:"rotate_display"`
-	Swipe          *AndroidSwipeActionModel         `tfsdk:"swipe"`
+	Id                  types.Int64                            `tfsdk:"id"`
+	Sequence            types.Int32                            `tfsdk:"sequence"`
+	Description         types.String                           `tfsdk:"description"`
+	AlwaysRequired      types.Bool                             `tfsdk:"always_required"`
+	Type                types.String                           `tfsdk:"type"`
+	WaitTime            types.Int32                            `tfsdk:"wait_time"`
+	Click               *AndroidClickActionModel               `tfsdk:"click"`
+	TextInput           *AndroidInputTextActionModel           `tfsdk:"text_input"`
+	PasswordInput       *AndroidInputPasswordActionModel       `tfsdk:"password_input"`
+	RotateDisplay       *AndroidRotateDisplayActionModel       `tfsdk:"rotate_display"`
+	SelectSpinnerOption *AndroidSelectSpinnerOptionActionModel `tfsdk:"select_spinner_option"`
+	Swipe               *AndroidSwipeActionModel               `tfsdk:"swipe"`
 }
 
 type AndroidClickActionModel struct {
@@ -231,6 +232,14 @@ type AndroidInputPasswordActionModel struct {
 
 type AndroidRotateDisplayActionModel struct {
 	Orientation types.String `tfsdk:"orientation"`
+}
+
+type AndroidSelectSpinnerOptionActionModel struct {
+	ComponentId        types.String `tfsdk:"component_id"`
+	Xpath              types.String `tfsdk:"xpath"`
+	SearchText         types.String `tfsdk:"search_text"`
+	OptionListPosition types.Int32  `tfsdk:"option_list_position"`
+	OptionListText     types.String `tfsdk:"option_list_text"`
 }
 
 type AndroidSwipeActionModel struct {

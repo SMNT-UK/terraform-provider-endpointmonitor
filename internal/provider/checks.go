@@ -143,17 +143,18 @@ type AndroidCheckForElement struct {
 }
 
 type AndroidStepInteraction struct {
-	Id                         int64                       `json:"id"`
-	Sequence                   int                         `json:"sequence"`
-	Description                string                      `json:"description"`
-	Action                     string                      `json:"action"`
-	AlwaysRequired             bool                        `json:"alwaysRequired"`
-	AndroidClickAction         *AndroidClickAction         `json:"androidClickAction"`
-	AndroidInputTextAction     *AndroidInputTextAction     `json:"androidInputTextAction"`
-	AndroidInputPasswordAction *AndroidInputPasswordAction `json:"androidInputPasswordAction"`
-	AndroidRotateDisplayAction *AndroidRotateDisplayAction `json:"androidRotateDisplayAction"`
-	AndroidSwipeAction         *AndroidSwipeAction         `json:"androidSwipeAction"`
-	AndroidWaitAction          *AndroidWaitAction          `json:"androidWaitAction"`
+	Id                               int64                             `json:"id"`
+	Sequence                         int                               `json:"sequence"`
+	Description                      string                            `json:"description"`
+	Action                           string                            `json:"action"`
+	AlwaysRequired                   bool                              `json:"alwaysRequired"`
+	AndroidClickAction               *AndroidClickAction               `json:"androidClickAction"`
+	AndroidInputTextAction           *AndroidInputTextAction           `json:"androidInputTextAction"`
+	AndroidInputPasswordAction       *AndroidInputPasswordAction       `json:"androidInputPasswordAction"`
+	AndroidRotateDisplayAction       *AndroidRotateDisplayAction       `json:"androidRotateDisplayAction"`
+	AndroidSelectSpinnerOptionAction *AndroidSelectSpinnerOptionAction `json:"androidSelectSpinnerOptionAction"`
+	AndroidSwipeAction               *AndroidSwipeAction               `json:"androidSwipeAction"`
+	AndroidWaitAction                *AndroidWaitAction                `json:"androidWaitAction"`
 }
 
 type AndroidClickAction struct {
@@ -176,6 +177,14 @@ type AndroidInputPasswordAction struct {
 
 type AndroidRotateDisplayAction struct {
 	Orientation string `json:"orientation"`
+}
+
+type AndroidSelectSpinnerOptionAction struct {
+	ComponentId        *string `json:"componentId"`
+	Xpath              *string `json:"xpath"`
+	SearchText         *string `json:"searchText"`
+	OptionListPosition *int32  `json:"optionListPosition"`
+	OptionListText     *string `json:"optionListText"`
 }
 
 type AndroidSwipeAction struct {
@@ -673,6 +682,16 @@ func mapToAndroidJourneyCheck(checkModel AndroidJourneyCheckModel) AndroidJourne
 				}
 			}
 
+			if stepInteractionModel.SelectSpinnerOption != nil {
+				stepInteraction.AndroidSelectSpinnerOptionAction = &AndroidSelectSpinnerOptionAction{
+					ComponentId:        stepInteractionModel.SelectSpinnerOption.ComponentId.ValueStringPointer(),
+					Xpath:              stepInteractionModel.SelectSpinnerOption.Xpath.ValueStringPointer(),
+					SearchText:         stepInteractionModel.SelectSpinnerOption.SearchText.ValueStringPointer(),
+					OptionListPosition: stepInteractionModel.SelectSpinnerOption.OptionListPosition.ValueInt32Pointer(),
+					OptionListText:     stepInteractionModel.SelectSpinnerOption.OptionListText.ValueStringPointer(),
+				}
+			}
+
 			if stepInteractionModel.Swipe != nil {
 				stepInteraction.AndroidSwipeAction = &AndroidSwipeAction{
 					ComponentId:           stepInteractionModel.Swipe.ComponentId.ValueStringPointer(),
@@ -770,6 +789,16 @@ func mapToAndroidJourneyCommonStep(stepModel AndroidJourneyCommonStepModel) Andr
 		if stepInteractionModel.RotateDisplay != nil {
 			stepInteraction.AndroidRotateDisplayAction = &AndroidRotateDisplayAction{
 				Orientation: stepInteractionModel.RotateDisplay.Orientation.ValueString(),
+			}
+		}
+
+		if stepInteractionModel.SelectSpinnerOption != nil {
+			stepInteraction.AndroidSelectSpinnerOptionAction = &AndroidSelectSpinnerOptionAction{
+				ComponentId:        stepInteractionModel.SelectSpinnerOption.ComponentId.ValueStringPointer(),
+				Xpath:              stepInteractionModel.SelectSpinnerOption.Xpath.ValueStringPointer(),
+				SearchText:         stepInteractionModel.SelectSpinnerOption.SearchText.ValueStringPointer(),
+				OptionListPosition: stepInteractionModel.SelectSpinnerOption.OptionListPosition.ValueInt32Pointer(),
+				OptionListText:     stepInteractionModel.SelectSpinnerOption.OptionListText.ValueStringPointer(),
 			}
 		}
 
@@ -1547,6 +1576,16 @@ func mapToAndroidJourneyCheckModel(check AndroidJourneyCheck) AndroidJourneyChec
 				}
 			}
 
+			if interaction.AndroidSelectSpinnerOptionAction != nil {
+				interactionModel.SelectSpinnerOption = &AndroidSelectSpinnerOptionActionModel{
+					ComponentId:        types.StringPointerValue(interaction.AndroidSelectSpinnerOptionAction.ComponentId),
+					Xpath:              types.StringPointerValue(interaction.AndroidSelectSpinnerOptionAction.Xpath),
+					SearchText:         types.StringPointerValue(interaction.AndroidSelectSpinnerOptionAction.SearchText),
+					OptionListPosition: types.Int32PointerValue(interaction.AndroidSelectSpinnerOptionAction.OptionListPosition),
+					OptionListText:     types.StringPointerValue(interaction.AndroidSelectSpinnerOptionAction.OptionListText),
+				}
+			}
+
 			if interaction.AndroidSwipeAction != nil {
 				interactionModel.Swipe = &AndroidSwipeActionModel{
 					ComponentId:           types.StringPointerValue(interaction.AndroidSwipeAction.ComponentId),
@@ -1642,6 +1681,16 @@ func mapToAndroidJourneyCommonStepModel(step AndroidJourneyCommonStep) AndroidJo
 		if interaction.AndroidRotateDisplayAction != nil {
 			interactionModel.RotateDisplay = &AndroidRotateDisplayActionModel{
 				Orientation: types.StringValue(interaction.AndroidRotateDisplayAction.Orientation),
+			}
+		}
+
+		if interaction.AndroidSelectSpinnerOptionAction != nil {
+			interactionModel.SelectSpinnerOption = &AndroidSelectSpinnerOptionActionModel{
+				ComponentId:        types.StringPointerValue(interaction.AndroidSelectSpinnerOptionAction.ComponentId),
+				Xpath:              types.StringPointerValue(interaction.AndroidSelectSpinnerOptionAction.Xpath),
+				SearchText:         types.StringPointerValue(interaction.AndroidSelectSpinnerOptionAction.SearchText),
+				OptionListPosition: types.Int32PointerValue(interaction.AndroidSelectSpinnerOptionAction.OptionListPosition),
+				OptionListText:     types.StringPointerValue(interaction.AndroidSelectSpinnerOptionAction.OptionListText),
 			}
 		}
 

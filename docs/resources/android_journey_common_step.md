@@ -58,6 +58,18 @@ resource "endpointmonitor_android_journey_common_step" "example" {
 
   step_interaction {
     sequence        = 3
+    description     = "Select Country"
+    always_required = true
+    type            = "SELECT_SPINNER_OPTION"
+
+    select_spinner_option {
+      component_id     = "login_country"
+      option_list_text = "Scotland"
+    }
+  }
+
+  step_interaction {
+    sequence        = 4
     description     = "Click Login"
     always_required = true
     type            = "CLICK"
@@ -144,7 +156,7 @@ Required:
 
 - `description` (String) A description to describe the action being taken. This is used as parts of alerts and reporting.
 - `sequence` (Number) The order in which to run each interaction, working in lowest number to highest.
-- `type` (String) The type of action to perform. Options are: CLICK, INPUT_TEXT, INPUT_PASSWORD, SAVE_SCREEN_SOURCE, ROTATE_DISPLAY, SCROLL_TO_ELEMENT, SWIPE, SCREENSHOT or WAIT.
+- `type` (String) The type of action to perform. Options are: CLICK, INPUT_TEXT, INPUT_PASSWORD, SAVE_SCREEN_SOURCE, ROTATE_DISPLAY, SCROLL_TO_ELEMENT, SELECT_SPINNER_OPTION, SWIPE, SCREENSHOT or WAIT.
 
 Optional:
 
@@ -152,6 +164,7 @@ Optional:
 - `click` (Block, Optional) The attributes required as part of performing a CLICK interaction during an Android Journey check. Only one attribute needs to be provided. (see [below for nested schema](#nestedblock--step_interaction--click))
 - `password_input` (Block, Optional) The attributes required as part of performing a INPUT_PASSWORD interaction during an Android Journey check. (see [below for nested schema](#nestedblock--step_interaction--password_input))
 - `rotate_display` (Block, Optional) The attributes required as part of performing a ROTATE_DISPLAY interaction during an Android Journey check. (see [below for nested schema](#nestedblock--step_interaction--rotate_display))
+- `select_spinner_option` (Block, Optional) The attributes required as part of performing a SELECT_SPINNER_OPTION interaction during an Android Journey check. Only one attribute needs to be provided. (see [below for nested schema](#nestedblock--step_interaction--select_spinner_option))
 - `swipe` (Block, Optional) The attributes required as part of performing a SWIPE interaction during an Android Journey check. (see [below for nested schema](#nestedblock--step_interaction--swipe))
 - `text_input` (Block, Optional) The attributes required as part of performing a INPUT_TEXT interaction during an Android Journey check. (see [below for nested schema](#nestedblock--step_interaction--text_input))
 - `wait_time` (Number) The number of milliseconds to wait for the WAIT interaction type.
@@ -186,6 +199,18 @@ Optional:
 Optional:
 
 - `orientation` (String) The orientation to rotate the screeen to, either PORTRAIT or LANDSCAPE.
+
+
+<a id="nestedblock--step_interaction--select_spinner_option"></a>
+### Nested Schema for `step_interaction.select_spinner_option`
+
+Optional:
+
+- `component_id` (String) The id of the spinner object to make the selection in. The id does not need to include the Android package name prefix.
+- `option_list_position` (Number) The position from the list of options within the spinner to select, starting from 0.
+- `option_list_text` (String) The value from the list of options within the spinner to select.
+- `search_text` (String) The text of the current selected spinner object value to search for to identify the spinner to interact with.
+- `xpath` (String) Xpath defining the spinner object to make the selection in.
 
 
 <a id="nestedblock--step_interaction--swipe"></a>

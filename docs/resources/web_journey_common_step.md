@@ -51,7 +51,7 @@ resource "endpointmonitor_web_journey_common_step" "example" {
   }
 
   action {
-    sequence        = 0
+    sequence        = 1
     description     = "Close any marketing pop-up."
     always_required = false
     type            = "CLICK"
@@ -62,7 +62,7 @@ resource "endpointmonitor_web_journey_common_step" "example" {
   }
 
   action {
-    sequence        = 1
+    sequence        = 2
     description     = "Accept Cookies"
     always_required = true
     type            = "CLICK"

@@ -229,9 +229,9 @@ func (r *AndroidJourneyCommonStepResource) Schema(_ context.Context, _ resource.
 						},
 						"type": schema.StringAttribute{
 							Required:    true,
-							Description: "The type of action to perform. Options are: CLICK, INPUT_TEXT, INPUT_PASSWORD, SAVE_SCREEN_SOURCE, ROTATE_DISPLAY, SCROLL_TO_ELEMENT, SWIPE, SCREENSHOT or WAIT.",
+							Description: "The type of action to perform. Options are: CLICK, INPUT_TEXT, INPUT_PASSWORD, SAVE_SCREEN_SOURCE, ROTATE_DISPLAY, SCROLL_TO_ELEMENT, SELECT_SPINNER_OPTION, SWIPE, SCREENSHOT or WAIT.",
 							Validators: []validator.String{
-								stringvalidator.OneOf("CLICK", "INPUT_TEXT", "INPUT_PASSWORD", "SAVE_SCREEN_SOURCE", "ROTATE_DISPLAY", "SCROLL_TO_ELEMENT", "SWIPE", "SCREENSHOT", "WAIT"),
+								stringvalidator.OneOf("CLICK", "INPUT_TEXT", "INPUT_PASSWORD", "SAVE_SCREEN_SOURCE", "ROTATE_DISPLAY", "SCROLL_TO_ELEMENT", "SELECT_SPINNER_OPTION", "SWIPE", "SCREENSHOT", "WAIT"),
 							},
 						},
 						"wait_time": schema.Int32Attribute{
@@ -347,6 +347,46 @@ func (r *AndroidJourneyCommonStepResource) Schema(_ context.Context, _ resource.
 									Description: "The orientation to rotate the screeen to, either PORTRAIT or LANDSCAPE.",
 									Validators: []validator.String{
 										stringvalidator.OneOf("PORTRAIT", "LANDSCAPE"),
+									},
+								},
+							},
+						},
+						"select_spinner_option": schema.SingleNestedBlock{
+							Description: "The attributes required as part of performing a SELECT_SPINNER_OPTION interaction during an Android Journey check. Only one attribute needs to be provided.",
+							Attributes: map[string]schema.Attribute{
+								"component_id": schema.StringAttribute{
+									Optional:    true,
+									Description: "The id of the spinner object to make the selection in. The id does not need to include the Android package name prefix.",
+									Validators: []validator.String{
+										stringvalidator.LengthAtLeast(1),
+									},
+								},
+								"xpath": schema.StringAttribute{
+									Optional:    true,
+									Description: "Xpath defining the spinner object to make the selection in.",
+									Validators: []validator.String{
+										stringvalidator.LengthAtLeast(1),
+									},
+								},
+								"search_text": schema.StringAttribute{
+									Optional:    true,
+									Description: "The text of the current selected spinner object value to search for to identify the spinner to interact with.",
+									Validators: []validator.String{
+										stringvalidator.LengthAtLeast(1),
+									},
+								},
+								"option_list_position": schema.Int32Attribute{
+									Optional:    true,
+									Description: "The position from the list of options within the spinner to select, starting from 0.",
+									Validators: []validator.Int32{
+										int32validator.AtLeast(0),
+									},
+								},
+								"option_list_text": schema.StringAttribute{
+									Optional:    true,
+									Description: "The value from the list of options within the spinner to select.",
+									Validators: []validator.String{
+										stringvalidator.LengthAtLeast(1),
 									},
 								},
 							},

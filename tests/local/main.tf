@@ -434,7 +434,19 @@ resource "endpointmonitor_android_journey_check" "android" {
     }
 
     step_interaction {
-      sequence        = 3
+      sequence = 3
+      description = "Test Spinner Selector"
+      always_required = false
+      type = "SELECT_SPINNER_OPTION"
+
+      select_spinner_option {
+        component_id     = "spinner_id"
+        option_list_text = "Option1"
+      }
+    }
+
+    step_interaction {
+      sequence        = 4
       description     = "Take Screenshot"
       always_required = true
       type            = "SCREENSHOT"

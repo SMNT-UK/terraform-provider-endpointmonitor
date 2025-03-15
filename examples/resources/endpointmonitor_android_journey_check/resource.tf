@@ -72,6 +72,18 @@ resource "endpointmonitor_android_journey_check" "example" {
 
     step_interaction {
       sequence        = 3
+      description     = "Select Country"
+      always_required = true
+      type            = "SELECT_SPINNER_OPTION"
+
+      select_spinner_option {
+        component_id     = "login_country"
+        option_list_text = "Scotland"
+      }
+    }
+
+    step_interaction {
+      sequence        = 4
       description     = "Click Login"
       always_required = true
       type            = "CLICK"
