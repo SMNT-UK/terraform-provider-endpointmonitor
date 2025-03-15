@@ -11,7 +11,7 @@ data "endpointmonitor_check_host" "app_02" {
 }
 
 data "endpointmonitor_check_group" "integration_tests" {
-  search = "Integration Tests"
+  search = "Jenkins Integration Tests"
 }
 
 data "endpointmonitor_web_journey_common_step" "initial" {
