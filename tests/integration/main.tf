@@ -21,7 +21,7 @@ resource "endpointmonitor_dashboard_group" "integration_tests" {
 }
 
 resource "endpointmonitor_check_group" "integration_tests" {
-  name               = "Integration Tests"
+  name               = "Jenkins Integration Tests"
   description        = "Integration test checks. Managed by Terraform."
   dashboard_group_id = endpointmonitor_dashboard_group.integration_tests.id
 }
